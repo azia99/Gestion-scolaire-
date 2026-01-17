@@ -1,112 +1,410 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Système de Gestion Scolaire - SGE</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; }
-        .container { display: flex; height: 100vh; }
-        .sidebar { width: 260px; background: #2c3e50; color: white; padding: 20px; overflow-y: auto; }
-        .logo-section { text-align: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 2px solid #34495e; }
-        .logo-section h1 { font-size: 24px; color: #3498db; margin-bottom: 5px; }
-        .logo-section p { font-size: 12px; color: #95a5a6; }
-        .menu-item { padding: 15px; margin: 8px 0; background: #34495e; border-radius: 8px; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 10px; }
-        .menu-item:hover { background: #3498db; transform: translateX(5px); }
-        .menu-item.active { background: #3498db; }
-        .menu-icon { font-size: 20px; }
-        .main-content { flex: 1; padding: 30px; overflow-y: auto; background: #ecf0f1; }
-        .header { background: white; padding: 20px 30px; border-radius: 10px; margin-bottom: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
-        .header h2 { color: #2c3e50; font-size: 28px; }
-        .content-section { display: none; }
-        .content-section.active { display: block; }
-        .card { background: white; padding: 25px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .card h3 { color: #2c3e50; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #3498db; }
-        .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; margin-bottom: 8px; color: #2c3e50; font-weight: 600; }
-        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 6px; font-size: 14px; transition: border 0.3s; }
-        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: #3498db; }
-        .btn { padding: 12px 30px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600; transition: all 0.3s; }
-        .btn-primary { background: #3498db; color: white; }
-        .btn-primary:hover { background: #2980b9; transform: translateY(-2px); }
-        .btn-success { background: #27ae60; color: white; }
-        .btn-success:hover { background: #229954; }
-        .btn-danger { background: #e74c3c; color: white; }
-        .btn-danger:hover { background: #c0392b; }
-        .btn-warning { background: #f39c12; color: white; }
-        .btn-warning:hover { background: #e67e22; }
-        .table-container { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        table th { background: #34495e; color: white; padding: 12px; text-align: left; }
-        table td { padding: 12px; border-bottom: 1px solid #ddd; }
-        table tr:hover { background: #f8f9fa; }
-        .action-buttons { display: flex; gap: 10px; }
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px; }
-        .stat-card { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 25px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
-        .stat-card h4 { font-size: 14px; opacity: 0.9; margin-bottom: 10px; }
-        .stat-card .stat-number { font-size: 36px; font-weight: bold; }
-        .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; justify-content: center; align-items: center; }
-        .modal.active { display: flex; }
-        .modal-content { background: white; padding: 30px; border-radius: 10px; max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto; }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #3498db; }
-        .close-modal { font-size: 28px; cursor: pointer; color: #e74c3c; }
-        .bulletin { background: white; padding: 40px; max-width: 800px; margin: 0 auto; }
-        .bulletin-header { text-align: center; margin-bottom: 30px; border-bottom: 3px solid #2c3e50; padding-bottom: 20px; }
-        .bulletin-header h1 { color: #2c3e50; margin-bottom: 5px; }
-        .bulletin-info { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px; }
-        .notes-table { margin: 20px 0; }
-        .notes-table th { background: #34495e; color: white; padding: 10px; }
-        .notes-table td { padding: 8px; text-align: center; }
-        .appreciation { margin-top: 20px; padding: 15px; background: #ecf0f1; border-left: 4px solid #3498db; }
-        @media print { .sidebar, .header, .no-print { display: none; } .main-content { padding: 0; } .bulletin { box-shadow: none; } }
-        .search-box { padding: 10px; border: 2px solid #ddd; border-radius: 6px; width: 300px; font-size: 14px; }
-        .badge { display: inline-block; padding: 5px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
-        .badge-success { background: #27ae60; color: white; }
-        .badge-warning { background: #f39c12; color: white; }
-        .badge-danger { background: #e74c3c; color: white; }
-        .notes-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px; }
-        .notes-grid input { padding: 8px; border: 2px solid #ddd; border-radius: 4px; text-align: center; }
-        .moyenne-display { background: #3498db; color: white; padding: 10px; border-radius: 6px; text-align: center; font-weight: bold; font-size: 18px; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="sidebar">
-            <div class="logo-section"><h1>🎓 SGE</h1><p>Système de Gestion d'Établissement</p></div>
-            <div class="menu-item active" onclick="showSection('dashboard')"><span class="menu-icon">📊</span><span>Tableau de bord</span></div>
-            <div class="menu-item" onclick="showSection('parametres')"><span class="menu-icon">⚙️</span><span>Paramètres</span></div>
-            <div class="menu-item" onclick="showSection('classes')"><span class="menu-icon">🏫</span><span>Classes</span></div>
-            <div class="menu-item" onclick="showSection('matieres')"><span class="menu-icon">📚</span><span>Matières</span></div>
-            <div class="menu-item" onclick="showSection('enseignants')"><span class="menu-icon">👨‍🏫</span><span>Enseignants</span></div>
-            <div class="menu-item" onclick="showSection('eleves')"><span class="menu-icon">👨‍🎓</span><span>Élèves</span></div>
-            <div class="menu-item" onclick="showSection('notes')"><span class="menu-icon">📝</span><span>Notes</span></div>
-            <div class="menu-item" onclick="showSection('bulletins')"><span class="menu-icon">📄</span><span>Bulletins</span></div>
+import React, { useState, useEffect } from 'react';
+
+const SGE = () => {
+  const [currentSection, setCurrentSection] = useState('dashboard');
+  const [activeModal, setActiveModal] = useState(null);
+  const [parametres, setParametres] = useState({
+    nomEtablissement: 'Établissement Scolaire',
+    anneeScolaire: '2025-2026',
+    adresse: '',
+    telephone: '',
+    email: '',
+    directeur: '',
+    censeur: '',
+    devise: 'Excellence et Discipline'
+  });
+  const [classes, setClasses] = useState([]);
+  const [matieres, setMatieres] = useState([]);
+  const [enseignants, setEnseignants] = useState([]);
+  const [eleves, setEleves] = useState([]);
+  const [notes, setNotes] = useState([]);
+  const [filterClasse, setFilterClasse] = useState('');
+  const [searchEleve, setSearchEleve] = useState('');
+  const [noteClasse, setNoteClasse] = useState('');
+  const [noteMatiere, setNoteMatiere] = useState('');
+  const [bulletinClasse, setBulletinClasse] = useState('');
+  const [bulletinEleve, setBulletinEleve] = useState('');
+  const [bulletinData, setBulletinData] = useState(null);
+
+  useEffect(() => {
+    const now = new Date();
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    document.getElementById('currentDate').textContent = now.toLocaleDateString('fr-FR', options);
+  }, []);
+
+  const generateMatricule = () => {
+    const year = new Date().getFullYear();
+    const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+    return `${year}${random}`;
+  };
+
+  const handleParametresSubmit = (e) => {
+    e.preventDefault();
+    const formData = {
+      nomEtablissement: e.target.nomEtablissement.value,
+      anneeScolaire: e.target.anneeScolaire.value,
+      adresse: e.target.adresse.value,
+      telephone: e.target.telephone.value,
+      email: e.target.email.value,
+      directeur: e.target.directeur.value,
+      censeur: e.target.censeur.value,
+      devise: e.target.devise.value
+    };
+    setParametres(formData);
+    alert('✅ Paramètres enregistrés avec succès !');
+  };
+
+  const handleClasseSubmit = (e) => {
+    e.preventDefault();
+    const newClasse = {
+      id: Date.now(),
+      niveau: e.target.classeNiveau.value,
+      serie: e.target.classeSerie.value,
+      effectifMax: parseInt(e.target.classeEffectifMax.value),
+      effectifActuel: 0
+    };
+    setClasses([...classes, newClasse]);
+    setActiveModal(null);
+    e.target.reset();
+    alert('✅ Classe ajoutée avec succès !');
+  };
+
+  const handleMatiereSubmit = (e) => {
+    e.preventDefault();
+    const selectedClasses = Array.from(e.target.matiereClasses.selectedOptions).map(opt => opt.value);
+    const newMatiere = {
+      id: Date.now(),
+      nom: e.target.matiereNom.value,
+      coefficient: parseFloat(e.target.matiereCoef.value),
+      classes: selectedClasses
+    };
+    setMatieres([...matieres, newMatiere]);
+    setActiveModal(null);
+    e.target.reset();
+    alert('✅ Matière ajoutée avec succès !');
+  };
+
+  const handleEnseignantSubmit = (e) => {
+    e.preventDefault();
+    const newEnseignant = {
+      id: Date.now(),
+      nom: e.target.enseignantNom.value,
+      sexe: e.target.enseignantSexe.value,
+      matiere: e.target.enseignantMatiere.value,
+      contact: e.target.enseignantContact.value,
+      statut: e.target.enseignantStatut.value
+    };
+    setEnseignants([...enseignants, newEnseignant]);
+    setActiveModal(null);
+    e.target.reset();
+    alert('✅ Enseignant ajouté avec succès !');
+  };
+
+  const handleEleveSubmit = (e) => {
+    e.preventDefault();
+    const classeId = e.target.eleveClasse.value;
+    const classe = classes.find(c => c.id === parseInt(classeId));
+    
+    if (classe && classe.effectifActuel >= classe.effectifMax) {
+      alert('❌ Cette classe a atteint son effectif maximum !');
+      return;
+    }
+
+    const newEleve = {
+      id: Date.now(),
+      matricule: generateMatricule(),
+      nom: e.target.eleveNom.value,
+      sexe: e.target.eleveSexe.value,
+      dateNaissance: e.target.eleveDateNaissance.value,
+      classe: classeId,
+      parent: e.target.eleveParent.value,
+      contactParent: e.target.eleveContactParent.value
+    };
+    
+    setEleves([...eleves, newEleve]);
+    setClasses(classes.map(c => 
+      c.id === parseInt(classeId) 
+        ? { ...c, effectifActuel: c.effectifActuel + 1 }
+        : c
+    ));
+    setActiveModal(null);
+    e.target.reset();
+    alert('✅ Élève ajouté avec succès !');
+  };
+
+  const deleteClasse = (id) => {
+    if (confirm('Êtes-vous sûr de vouloir supprimer cette classe ?')) {
+      setClasses(classes.filter(c => c.id !== id));
+    }
+  };
+
+  const deleteMatiere = (id) => {
+    if (confirm('Êtes-vous sûr de vouloir supprimer cette matière ?')) {
+      setMatieres(matieres.filter(m => m.id !== id));
+    }
+  };
+
+  const deleteEnseignant = (id) => {
+    if (confirm('Êtes-vous sûr de vouloir supprimer cet enseignant ?')) {
+      setEnseignants(enseignants.filter(e => e.id !== id));
+    }
+  };
+
+  const deleteEleve = (id) => {
+    if (confirm('Êtes-vous sûr de vouloir supprimer cet élève ?')) {
+      const eleve = eleves.find(e => e.id === id);
+      setEleves(eleves.filter(e => e.id !== id));
+      setClasses(classes.map(c => 
+        c.id === parseInt(eleve.classe) 
+          ? { ...c, effectifActuel: c.effectifActuel - 1 }
+          : c
+      ));
+    }
+  };
+
+  const getClasseName = (classeId) => {
+    const classe = classes.find(c => c.id === parseInt(classeId));
+    return classe ? `${classe.niveau} ${classe.serie}` : '';
+  };
+
+  const getMatiereName = (matiereId) => {
+    const matiere = matieres.find(m => m.id === parseInt(matiereId));
+    return matiere ? matiere.nom : '';
+  };
+
+  const filteredEleves = eleves.filter(eleve => {
+    const matchClasse = !filterClasse || eleve.classe === filterClasse;
+    const matchSearch = !searchEleve || eleve.nom.toLowerCase().includes(searchEleve.toLowerCase()) || eleve.matricule.includes(searchEleve);
+    return matchClasse && matchSearch;
+  });
+
+  const saveNote = (eleveId, value) => {
+    const noteIndex = notes.findIndex(n => 
+      n.eleveId === eleveId && 
+      n.classeId === noteClasse && 
+      n.matiereId === noteMatiere
+    );
+
+    if (noteIndex >= 0) {
+      const newNotes = [...notes];
+      newNotes[noteIndex].note = parseFloat(value) || 0;
+      setNotes(newNotes);
+    } else {
+      setNotes([...notes, {
+        id: Date.now(),
+        eleveId,
+        classeId: noteClasse,
+        matiereId: noteMatiere,
+        note: parseFloat(value) || 0
+      }]);
+    }
+  };
+
+  const getNote = (eleveId) => {
+    const note = notes.find(n => 
+      n.eleveId === eleveId && 
+      n.classeId === noteClasse && 
+      n.matiereId === noteMatiere
+    );
+    return note ? note.note : '';
+  };
+
+  const generateBulletin = () => {
+    if (!bulletinClasse || !bulletinEleve) {
+      alert('❌ Veuillez sélectionner une classe et un élève');
+      return;
+    }
+
+    const eleve = eleves.find(e => e.id === parseInt(bulletinEleve));
+    const classe = classes.find(c => c.id === parseInt(bulletinClasse));
+    const matieresClasse = matieres.filter(m => m.classes.includes(bulletinClasse));
+    
+    const notesEleve = matieresClasse.map(matiere => {
+      const note = notes.find(n => 
+        n.eleveId === parseInt(bulletinEleve) && 
+        n.matiereId === matiere.id.toString()
+      );
+      return {
+        matiere: matiere.nom,
+        coefficient: matiere.coefficient,
+        note: note ? note.note : 0,
+        total: note ? note.note * matiere.coefficient : 0
+      };
+    });
+
+    const totalPoints = notesEleve.reduce((sum, n) => sum + n.total, 0);
+    const totalCoefficients = notesEleve.reduce((sum, n) => sum + n.coefficient, 0);
+    const moyenne = totalCoefficients > 0 ? (totalPoints / totalCoefficients).toFixed(2) : 0;
+
+    setBulletinData({
+      eleve,
+      classe,
+      notes: notesEleve,
+      moyenne,
+      totalPoints,
+      totalCoefficients
+    });
+  };
+
+  return (
+    <div style={{ display: 'flex', height: '100vh', fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif" }}>
+      {/* Sidebar */}
+      <div style={{ width: '260px', background: '#2c3e50', color: 'white', padding: '20px', overflowY: 'auto' }}>
+        <div style={{ textAlign: 'center', marginBottom: '30px', paddingBottom: '20px', borderBottom: '2px solid #34495e' }}>
+          <h1 style={{ fontSize: '24px', color: '#3498db', marginBottom: '5px' }}>🎓 SGE</h1>
+          <p style={{ fontSize: '12px', color: '#95a5a6' }}>Système de Gestion d'Établissement</p>
         </div>
-        <div class="main-content">
-            ... <!-- Le contenu des sections dashboard, paramètres, classes, matières, enseignants, élèves, notes, bulletins reste inchangé -->
-        </div>
-    </div>
-    <div id="modalClasse" class="modal">
-        ... <!-- Modal classe -->
-    </div>
-    <div id="modalMatiere" class="modal">
-        ... <!-- Modal matière -->
-    </div>
-    <div id="modalEnseignant" class="modal">
-        ... <!-- Modal enseignant -->
-    </div>
-    <div id="modalEleve" class="modal">
-        ... <!-- Modal élève -->
-    </div>
-    <script>
-        class Database{constructor(){this.initializeData()}initializeData(){if(!localStorage.getItem('parametres'))localStorage.setItem('parametres',JSON.stringify({nomEtablissement:'Établissement Scolaire',anneeScolaire:'2025-2026',adresse:'',telephone:'',email:'',directeur:'',censeur:'',devise:'Excellence et Discipline'}));if(!localStorage.getItem('classes'))localStorage.setItem('classes',JSON.stringify([]));if(!localStorage.getItem('matieres'))localStorage.setItem('matieres',JSON.stringify([]));i
-const matieres=db.get('matieres');const select=document.getElementById('enseignantMatiere');select.innerHTML='<option value="">-- Sélectionner --</option>';matieres.forEach(matiere=>{const option=document.createElement('option');option.value=matiere.nom;option.textContent=matiere.nom;select.appendChild(option)})}
-        document.getElementById('formEnseignant').addEventListener('submit',function(e){e.preventDefault();const enseignant={id:Date.now(),nom:document.getElementById('enseignantNom').value,sexe:document.getElementById('enseignantSexe').value,matiere:document.getElementById('enseignantMatiere').value,contact:document.getElementById('enseignantContact').value,statut:document.getElementById('enseignantStatut').value};db.add('enseignants',enseignant);displayEnseignants();closeModal('modalEnseignant');this.reset();updateDashboard();alert('✅ Enseignant ajouté avec succès!')});
-        function displayEnseignants(){const enseignants=db.get('enseignants');const tbody=document.querySelector('#tableEnseignants tbody');tbody.innerHTML='';enseignants.forEach((enseignant,index)=>{const tr=document.createElement('tr');tr.innerHTML=`<td>${enseignant.nom}</td><td>${enseignant.sexe==='M'?'Masculin':'Féminin'}</td><td>${enseignant.matiere}</td><td>${enseignant.contact}</td><td><span class="badge ${enseignant.statut==='Permanent'?'badge-success':'badge-warning'}">${enseignant.statut}</span></td><td class="action-buttons"><button class="btn btn-danger" onclick="deleteEnseignant(${index})">🗑️ Supprimer</button></td>`;tbody.appendChild(tr)})}
-        ... <!-- Le reste du code JavaScript reste inchangé, incluant la gestion des élèves, notes et bulletins -->
-        window.onload=init;
-    </script>
-</body>
-</html>
+        {[
+          { id: 'dashboard', icon: '📊', label: 'Tableau de bord' },
+          { id: 'parametres', icon: '⚙️', label: 'Paramètres' },
+          { id: 'classes', icon: '🏫', label: 'Classes' },
+          { id: 'matieres', icon: '📚', label: 'Matières' },
+          { id: 'enseignants', icon: '👨‍🏫', label: 'Enseignants' },
+          { id: 'eleves', icon: '👨‍🎓', label: 'Élèves' },
+          { id: 'notes', icon: '📝', label: 'Notes' },
+          { id: 'bulletins', icon: '📄', label: 'Bulletins' }
+        ].map(item => (
+          <div
+            key={item.id}
+            onClick={() => setCurrentSection(item.id)}
+            style={{
+              padding: '15px',
+              margin: '8px 0',
+              background: currentSection === item.id ? '#3498db' : '#34495e',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px',
+              transition: 'all 0.3s'
+            }}
+          >
+            <span style={{ fontSize: '20px' }}>{item.icon}</span>
+            <span>{item.label}</span>
+          </div>
+        ))}
+      </div>
+
+      {/* Main Content */}
+      <div style={{ flex: 1, padding: '30px', overflowY: 'auto', background: '#ecf0f1' }}>
+        {/* Dashboard */}
+        {currentSection === 'dashboard' && (
+          <div>
+            <div style={{ background: 'white', padding: '20px 30px', borderRadius: '10px', marginBottom: '30px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h2 style={{ color: '#2c3e50', fontSize: '28px' }}>Tableau de bord</h2>
+              <div id="currentDate"></div>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '20px', marginBottom: '30px' }}>
+              {[
+                { label: 'Total Élèves', value: eleves.length, gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' },
+                { label: 'Total Classes', value: classes.length, gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' },
+                { label: 'Total Enseignants', value: enseignants.length, gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)' },
+                { label: 'Total Matières', value: matieres.length, gradient: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)' }
+              ].map((stat, idx) => (
+                <div key={idx} style={{ background: stat.gradient, color: 'white', padding: '25px', borderRadius: '10px', boxShadow: '0 4px 15px rgba(0,0,0,0.2)' }}>
+                  <h4 style={{ fontSize: '14px', opacity: 0.9, marginBottom: '10px' }}>{stat.label}</h4>
+                  <div style={{ fontSize: '36px', fontWeight: 'bold' }}>{stat.value}</div>
+                </div>
+              ))}
+            </div>
+            <div style={{ background: 'white', padding: '25px', borderRadius: '10px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }}>
+              <h3 style={{ color: '#2c3e50', marginBottom: '20px', paddingBottom: '10px', borderBottom: '2px solid #3498db' }}>Aperçu rapide</h3>
+              <p>Bienvenue dans votre système de gestion scolaire. Utilisez le menu à gauche pour naviguer entre les différentes sections.</p>
+            </div>
+          </div>
+        )}
+
+        {/* Paramètres */}
+        {currentSection === 'parametres' && (
+          <div>
+            <div style={{ background: 'white', padding: '20px 30px', borderRadius: '10px', marginBottom: '30px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }}>
+              <h2 style={{ color: '#2c3e50', fontSize: '28px' }}>Paramètres de l'établissement</h2>
+            </div>
+            <div style={{ background: 'white', padding: '25px', borderRadius: '10px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }}>
+              <h3 style={{ color: '#2c3e50', marginBottom: '20px', paddingBottom: '10px', borderBottom: '2px solid #3498db' }}>Informations générales</h3>
+              <form onSubmit={handleParametresSubmit}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '20px' }}>
+                  <div style={{ marginBottom: '20px' }}>
+                    <label style={{ display: 'block', marginBottom: '8px', color: '#2c3e50', fontWeight: '600' }}>Nom de l'établissement</label>
+                    <input type="text" name="nomEtablissement" defaultValue={parametres.nomEtablissement} placeholder="Ex: Collège Moderne" style={{ width: '100%', padding: '12px', border: '2px solid #ddd', borderRadius: '6px', fontSize: '14px' }} />
+                  </div>
+                  <div style={{ marginBottom: '20px' }}>
+                    <label style={{ display: 'block', marginBottom: '8px', color: '#2c3e50', fontWeight: '600' }}>Année scolaire</label>
+                    <input type="text" name="anneeScolaire" defaultValue={parametres.anneeScolaire} placeholder="Ex: 2025-2026" style={{ width: '100%', padding: '12px', border: '2px solid #ddd', borderRadius: '6px', fontSize: '14px' }} />
+                  </div>
+                  <div style={{ marginBottom: '20px' }}>
+                    <label style={{ display: 'block', marginBottom: '8px', color: '#2c3e50', fontWeight: '600' }}>Adresse</label>
+                    <input type="text" name="adresse" defaultValue={parametres.adresse} placeholder="Adresse complète" style={{ width: '100%', padding: '12px', border: '2px solid #ddd', borderRadius: '6px', fontSize: '14px' }} />
+                  </div>
+                  <div style={{ marginBottom: '20px' }}>
+                    <label style={{ display: 'block', marginBottom: '8px', color: '#2c3e50', fontWeight: '600' }}>Téléphone</label>
+                    <input type="tel" name="telephone" defaultValue={parametres.telephone} placeholder="+225 XX XX XX XX" style={{ width: '100%', padding: '12px', border: '2px solid #ddd', borderRadius: '6px', fontSize: '14px' }} />
+                  </div>
+                  <div style={{ marginBottom: '20px' }}>
+                    <label style={{ display: 'block', marginBottom: '8px', color: '#2c3e50', fontWeight: '600' }}>Email</label>
+                    <input type="email" name="email" defaultValue={parametres.email} placeholder="contact@etablissement.com" style={{ width: '100%', padding: '12px', border: '2px solid #ddd', borderRadius: '6px', fontSize: '14px' }} />
+                  </div>
+                  <div style={{ marginBottom: '20px' }}>
+                    <label style={{ display: 'block', marginBottom: '8px', color: '#2c3e50', fontWeight: '600' }}>Directeur Général</label>
+                    <input type="text" name="directeur" defaultValue={parametres.directeur} placeholder="Nom du directeur" style={{ width: '100%', padding: '12px', border: '2px solid #ddd', borderRadius: '6px', fontSize: '14px' }} />
+                  </div>
+                  <div style={{ marginBottom: '20px' }}>
+                    <label style={{ display: 'block', marginBottom: '8px', color: '#2c3e50', fontWeight: '600' }}>Censeur/Proviseur</label>
+                    <input type="text" name="censeur" defaultValue={parametres.censeur} placeholder="Nom du censeur" style={{ width: '100%', padding: '12px', border: '2px solid #ddd', borderRadius: '6px', fontSize: '14px' }} />
+                  </div>
+                  <div style={{ marginBottom: '20px' }}>
+                    <label style={{ display: 'block', marginBottom: '8px', color: '#2c3e50', fontWeight: '600' }}>Devise de l'établissement</label>
+                    <input type="text" name="devise" defaultValue={parametres.devise} placeholder="Ex: Excellence et Discipline" style={{ width: '100%', padding: '12px', border: '2px solid #ddd', borderRadius: '6px', fontSize: '14px' }} />
+                  </div>
+                </div>
+                <button type="submit" style={{ padding: '12px 30px', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '14px', fontWeight: '600', background: '#3498db', color: 'white' }}>💾 Enregistrer les paramètres</button>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* Classes */}
+        {currentSection === 'classes' && (
+          <div>
+            <div style={{ background: 'white', padding: '20px 30px', borderRadius: '10px', marginBottom: '30px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h2 style={{ color: '#2c3e50', fontSize: '28px' }}>Gestion des classes</h2>
+              <button onClick={() => setActiveModal('classe')} style={{ padding: '12px 30px', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '14px', fontWeight: '600', background: '#27ae60', color: 'white' }}>➕ Ajouter une classe</button>
+            </div>
+            <div style={{ background: 'white', padding: '25px', borderRadius: '10px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }}>
+              <h3 style={{ color: '#2c3e50', marginBottom: '20px', paddingBottom: '10px', borderBottom: '2px solid #3498db' }}>Liste des classes</h3>
+              <div style={{ overflowX: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '20px' }}>
+                  <thead>
+                    <tr>
+                      <th style={{ background: '#34495e', color: 'white', padding: '12px', textAlign: 'left' }}>Niveau</th>
+                      <th style={{ background: '#34495e', color: 'white', padding: '12px', textAlign: 'left' }}>Série</th>
+                      <th style={{ background: '#34495e', color: 'white', padding: '12px', textAlign: 'left' }}>Effectif max</th>
+                      <th style={{ background: '#34495e', color: 'white', padding: '12px', textAlign: 'left' }}>Effectif actuel</th>
+                      <th style={{ background: '#34495e', color: 'white', padding: '12px', textAlign: 'left' }}>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {classes.map(classe => (
+                      <tr key={classe.id} style={{ borderBottom: '1px solid #ddd' }}>
+                        <td style={{ padding: '12px' }}>{classe.niveau}</td>
+                        <td style={{ padding: '12px' }}>{classe.serie}</td>
+                        <td style={{ padding: '12px' }}>{classe.effectifMax}</td>
+                        <td style={{ padding: '12px' }}>{classe.effectifActuel}</td>
+                        <td style={{ padding: '12px' }}>
+                          <button onClick={() => deleteClasse(classe.id)} style={{ padding: '8px 16px', border: 'none', borderRadius: '6px', cursor: 'pointer', background: '#e74c3c', color: 'white', fontSize: '12px' }}>🗑️ Supprimer</button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Matières */}
+        {currentSection === 'matieres' && (
+          <div>
+            <div style={{ background: 'white', padding: '20px 30px', borderRadius: '10px', marginBottom: '30px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h2 style={{ color: '#2c3e50', fontSize: '28px' }}>Gestion des matières</h2>
+              <button onClick={() => setActiveModal('matiere')} style={{
