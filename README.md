@@ -1,802 +1,576 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SGS - Système de Gestion Scolaire</title>
+    <title>Gestion d'Établissement Scolaire</title>
     <style>
-        * {
+        /* Styles CSS de base */
+        body {
+            font-family: sans-serif;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
+            background-color: #f4f4f4;
         }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .app-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            overflow: hidden;
-        }
-
-        .header {
-            background: #2c3e50;
-            color: white;
-            padding: 20px 30px;
+        .container {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .header h1 {
-            font-size: 22px;
-        }
-
-        .user-info {
-            font-size: 14px;
-        }
-
-        .content-wrapper {
-            display: flex;
-            min-height: 700px;
+            height: 100vh;
         }
 
         .sidebar {
-            width: 220px;
-            background: #34495e;
-            padding: 15px;
-        }
-
-        .menu-btn {
-            width: 100%;
-            padding: 14px;
-            margin: 5px 0;
-            background: #3498db;
+            width: 200px;
+            background-color: #333;
             color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
-            transition: all 0.3s;
-            text-align: left;
+            padding: 20px;
         }
 
-        .menu-btn:hover {
-            background: #2980b9;
-            transform: translateX(5px);
-        }
-
-        .menu-btn.active {
-            background: #27ae60;
-        }
-
-        .content {
-            flex: 1;
-            padding: 30px;
-            background: #ecf0f1;
-            overflow-y: auto;
-            max-height: 700px;
-        }
-
-        .page-title {
-            font-size: 26px;
-            color: #2c3e50;
-            margin-bottom: 25px;
-            font-weight: bold;
-            border-bottom: 3px solid #3498db;
-            padding-bottom: 10px;
-        }
-
-        .stats-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .stat-card {
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            text-align: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            transition: transform 0.3s;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .stat-card.success {
-            border-top: 5px solid #27ae60;
-        }
-
-        .stat-card.primary {
-            border-top: 5px solid #3498db;
-        }
-
-        .stat-card.warning {
-            border-top: 5px solid #f39c12;
-        }
-
-        .stat-card.danger {
-            border-top: 5px solid #e74c3c;
-        }
-
-        .stat-number {
-            font-size: 42px;
-            font-weight: bold;
-            color: #2c3e50;
-            margin-bottom: 10px;
-        }
-
-        .stat-label {
-            font-size: 16px;
-            color: #7f8c8d;
-            font-weight: 500;
-        }
-
-        .activity-box {
-            background: white;
-            padding: 25px;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-
-        .activity-box h3 {
-            margin-bottom: 20px;
-            color: #2c3e50;
-            font-size: 20px;
-        }
-
-        .activity-item {
-            padding: 12px;
-            border-left: 4px solid #3498db;
-            margin-bottom: 12px;
-            background: #f8f9fa;
-            font-size: 14px;
-            border-radius: 4px;
-        }
-
-        .action-buttons {
-            margin-bottom: 25px;
-        }
-
-        .btn {
-            padding: 12px 24px;
-            border: none;
-            border-radius: 6px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-right: 10px;
-            transition: all 0.3s;
-            font-size: 14px;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-        }
-
-        .btn-success {
-            background: #27ae60;
-            color: white;
-        }
-
-        .btn-primary {
-            background: #3498db;
-            color: white;
-        }
-
-        .btn-warning {
-            background: #f39c12;
-            color: white;
-        }
-
-        .data-table {
-            width: 100%;
-            background: white;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-
-        .data-table table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .data-table th {
-            background: #34495e;
-            color: white;
-            padding: 16px;
-            text-align: left;
-            font-weight: 600;
-        }
-
-        .data-table td {
-            padding: 14px 16px;
-            border-bottom: 1px solid #ecf0f1;
-        }
-
-        .data-table tr:hover {
-            background: #f8f9fa;
-        }
-
-        .search-box {
-            margin-bottom: 20px;
-        }
-
-        .search-box input {
-            width: 350px;
-            padding: 12px 16px;
-            border: 2px solid #ddd;
-            border-radius: 6px;
-            font-size: 14px;
-        }
-
-        .search-box input:focus {
-            outline: none;
-            border-color: #3498db;
-        }
-
-        .info-section {
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-        }
-
-        .info-section h2 {
-            color: #2c3e50;
-            margin-bottom: 20px;
-            font-size: 22px;
-        }
-
-        .features-list {
+        .sidebar ul {
             list-style: none;
             padding: 0;
         }
 
-        .features-list li {
-            padding: 12px 15px;
-            margin: 8px 0;
-            background: #f8f9fa;
-            border-left: 5px solid #3498db;
-            border-radius: 4px;
+        .sidebar li {
+            margin-bottom: 10px;
         }
 
-        .form-group {
+        .sidebar a {
+            color: white;
+            text-decoration: none;
+            display: block;
+            padding: 5px;
+        }
+
+        .sidebar a:hover {
+            background-color: #555;
+        }
+
+        .content {
+            flex: 1;
+            padding: 20px;
+        }
+
+        /* Styles pour les tableaux */
+        table {
+            width: 100%;
+            border-collapse: collapse;
             margin-bottom: 20px;
         }
 
-        .form-group label {
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        /* Styles pour les formulaires */
+        form {
+            margin-bottom: 20px;
+        }
+
+        label {
             display: block;
-            margin-bottom: 8px;
-            color: #2c3e50;
-            font-weight: 600;
+            margin-bottom: 5px;
         }
 
-        .form-group select,
-        .form-group input {
+        input[type="text"],
+        input[type="number"],
+        select {
             width: 100%;
-            padding: 12px;
-            border: 2px solid #ddd;
-            border-radius: 6px;
-            font-size: 14px;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            box-sizing: border-box;
         }
 
-        .stat-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 14px;
-            background: #f8f9fa;
-            margin: 10px 0;
-            border-left: 5px solid #3498db;
-            border-radius: 4px;
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            cursor: pointer;
         }
 
-        .stat-row strong {
-            color: #2c3e50;
+        button:hover {
+            background-color: #3e8e41;
+        }
+
+        /* Styles spécifiques pour les sections */
+        #parametres,
+        #classes,
+        #eleves,
+        #enseignants,
+        #matieres,
+        #notes,
+        #bulletins {
+            display: none;
+        }
+
+        #parametres.active,
+        #classes.active,
+        #eleves.active,
+        #enseignants.active,
+        #matieres.active,
+        #notes.active,
+        #bulletins.active {
+            display: block;
         }
     </style>
 </head>
+
 <body>
-    <div class="app-container">
-        <div class="header">
-            <h1>🏫 SGS - Système de Gestion Scolaire</h1>
-            <div class="user-info">Utilisateur: <strong>Administrateur</strong></div>
+    <div class="container">
+        <div class="sidebar">
+            <h2>Menu</h2>
+            <ul>
+                <li><a href="#" onclick="showSection('parametres')">Paramètres</a></li>
+                <li><a href="#" onclick="showSection('classes')">Classes</a></li>
+                <li><a href="#" onclick="showSection('eleves')">Élèves</a></li>
+                <li><a href="#" onclick="showSection('enseignants')">Enseignants</a></li>
+                <li><a href="#" onclick="showSection('matieres')">Matières</a></li>
+                <li><a href="#" onclick="showSection('notes')">Notes</a></li>
+                <li><a href="#" onclick="showSection('bulletins')">Bulletins</a></li>
+                <li><a href="#" onclick="printBulletin()">Impression</a></li>
+            </ul>
         </div>
-        
-        <div class="content-wrapper">
-            <div class="sidebar">
-                <button class="menu-btn active" onclick="showPage('dashboard')">📊 Tableau de Bord</button>
-                <button class="menu-btn" onclick="showPage('classes')">🎓 Classes</button>
-                <button class="menu-btn" onclick="showPage('eleves')">👨‍🎓 Élèves</button>
-                <button class="menu-btn" onclick="showPage('enseignants')">👨‍🏫 Enseignants</button>
-                <button class="menu-btn" onclick="showPage('matieres')">📚 Matières</button>
-                <button class="menu-btn" onclick="showPage('notes')">📝 Notes</button>
-                <button class="menu-btn" onclick="showPage('bulletins')">📋 Bulletins</button>
-                <button class="menu-btn" onclick="showPage('statistiques')">📈 Statistiques</button>
-                <button class="menu-btn" onclick="showPage('about')">ℹ️ À propos</button>
-            </div>
-            
-            <div class="content" id="content">
-                <!-- Content will be loaded here -->
-            </div>
+
+        <div class="content">
+            <!-- Sections de contenu -->
+            <section id="parametres">
+                <h2>Paramètres de l'Établissement</h2>
+                <form id="formParametres">
+                    <label for="nomEtablissement">Nom de l'établissement:</label>
+                    <input type="text" id="nomEtablissement" name="nomEtablissement">
+
+                    <label for="logoEtablissement">Logo de l'établissement:</label>
+                    <input type="text" id="logoEtablissement" name="logoEtablissement">
+
+                    <label for="adresseEtablissement">Adresse:</label>
+                    <input type="text" id="adresseEtablissement" name="adresseEtablissement">
+
+                    <label for="telephoneEtablissement">Téléphone:</label>
+                    <input type="text" id="telephoneEtablissement" name="telephoneEtablissement">
+
+                    <label for="emailEtablissement">Email:</label>
+                    <input type="text" id="emailEtablissement" name="emailEtablissement">
+
+                    <label for="anneeScolaire">Année Scolaire (ex: 2025-2026):</label>
+                    <input type="text" id="anneeScolaire" name="anneeScolaire">
+
+                    <label for="directeurGeneral">Directeur Général:</label>
+                    <input type="text" id="directeurGeneral" name="directeurGeneral">
+
+                    <label for="censeurProviseur">Censeur / Proviseur:</label>
+                    <input type="text" id="censeurProviseur" name="censeurProviseur">
+
+                    <label for="intendantEconome">Intendant / Econome:</label>
+                    <input type="text" id="intendantEconome" name="intendantEconome">
+
+                    <label for="deviseSlogan">Devise ou Slogan:</label>
+                    <input type="text" id="deviseSlogan" name="deviseSlogan">
+
+                    <button type="button" onclick="saveParameters()">Enregistrer</button>
+                </form>
+            </section>
+
+            <section id="classes">
+                <h2>Gestion des Classes</h2>
+                <button onclick="ajouterClasse()">Ajouter Classe</button>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Série</th>
+                            <th>Effectif Max</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="listeClasses">
+                        <!-- Les classes seront ajoutées ici par JavaScript -->
+                    </tbody>
+                </table>
+            </section>
+
+            <section id="eleves">
+                <h2>Gestion des Élèves</h2>
+                <button onclick="ajouterEleve()">Ajouter Élève</button>
+                <table id="eleveTable">
+                    <thead>
+                        <tr>
+                            <th>Matricule</th>
+                            <th>Nom</th>
+                            <th>Prénom</th>
+                            <th>Classe</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="listeEleves">
+                        <!-- Les élèves seront ajoutés ici par JavaScript -->
+                    </tbody>
+                </table>
+            </section>
+
+            <section id="enseignants">
+                <h2>Gestion des Enseignants</h2>
+                <button onclick="ajouterEnseignant()">Ajouter Enseignant</button>
+                <table id="enseignantTable">
+                    <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Prénom</th>
+                            <th>Matière</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="listeEnseignants">
+                        <!-- Les enseignants seront ajoutés ici par JavaScript -->
+                    </tbody>
+                </table>
+            </section>
+
+            <section id="matieres">
+                <h2>Gestion des Matières</h2>
+                <button onclick="ajouterMatiere()">Ajouter Matière</button>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Coefficient</th>
+                            <th>Classe</th>
+                            <th>Enseignant</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="listeMatieres">
+                        <!-- Les matières seront ajoutées ici par JavaScript -->
+                    </tbody>
+                </table>
+            </section>
+
+            <section id="notes">
+                <h2>Saisie des Notes</h2>
+                <label for="classeNotes">Sélectionner la classe:</label>
+                <select id="classeNotes" onchange="afficherElevesPourNotes()">
+                    <!-- Les options de classe seront ajoutées ici par JavaScript -->
+                </select>
+                <table id="tableNotes">
+                    <thead>
+                        <tr>
+                            <th>Nom de l'élève</th>
+                            <th>Matière</th>
+                            <th>Note 1</th>
+                            <th>Note 2</th>
+                            <th>Note 3</th>
+                            <th>Moyenne</th>
+                        </tr>
+                    </thead>
+                    <tbody id="listeNotes">
+                        <!-- Les notes seront ajoutées ici par JavaScript -->
+                    </tbody>
+                </table>
+            </section>
+
+            <section id="bulletins">
+                <h2>Bulletins Scolaires</h2>
+                <label for="classeBulletins">Sélectionner la classe:</label>
+                <select id="classeBulletins" onchange="afficherElevesPourBulletins()">
+                    <!-- Les options de classe seront ajoutées ici par JavaScript -->
+                </select>
+                <table id="tableBulletins">
+                    <thead>
+                        <tr>
+                            <th>Nom de l'élève</th>
+                            <th>Moyenne Générale</th>
+                            <th>Rang</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="listeBulletins">
+                        <!-- Les bulletins seront ajoutés ici par JavaScript -->
+                    </tbody>
+                </table>
+            </section>
         </div>
     </div>
 
     <script>
-        const data = {
-            classes: [
-                {id: 1, nom: '6ème A', niveau: 'Collège', effectif_max: 45, effectif: 42},
-                {id: 2, nom: '6ème B', niveau: 'Collège', effectif_max: 45, effectif: 40},
-                {id: 3, nom: '5ème A', niveau: 'Collège', effectif_max: 45, effectif: 38},
-                {id: 4, nom: '4ème A', niveau: 'Collège', effectif_max: 45, effectif: 35},
-                {id: 5, nom: '3ème A', niveau: 'Collège', effectif_max: 45, effectif: 33},
-                {id: 6, nom: '2nde A', niveau: 'Lycée', effectif_max: 50, effectif: 45},
-                {id: 7, nom: '1ère C', niveau: 'Lycée', effectif_max: 45, effectif: 38},
-                {id: 8, nom: 'Terminale C', niveau: 'Lycée', effectif_max: 45, effectif: 36}
-            ],
-            eleves: [
-                {id: 1, matricule: 'E001', nom: 'KOUASSI', prenoms: 'Jean-Pierre', sexe: 'M', classe: '6ème A', telephone: '+225 01 02 03 04 05'},
-                {id: 2, matricule: 'E002', nom: 'DIALLO', prenoms: 'Fatou', sexe: 'F', classe: '6ème A', telephone: '+225 01 02 03 04 06'},
-                {id: 3, matricule: 'E003', nom: 'TRAORE', prenoms: 'Mamadou', sexe: 'M', classe: '5ème A', telephone: '+225 01 02 03 04 07'},
-                {id: 4, matricule: 'E004', nom: 'KONE', prenoms: 'Awa', sexe: 'F', classe: '4ème A', telephone: '+225 01 02 03 04 08'},
-                {id: 5, matricule: 'E005', nom: 'N\'GUESSAN', prenoms: 'Konan', sexe: 'M', classe: '3ème A', telephone: '+225 01 02 03 04 09'}
-            ],
-            enseignants: [
-                {id: 1, nom: 'AMANI', prenoms: 'Kouadio', specialite: 'Mathématiques', telephone: '+225 07 08 09 10 11', email: 'amani@sgs.edu'},
-                {id: 2, nom: 'BAMBA', prenoms: 'Marie', specialite: 'Français', telephone: '+225 07 08 09 10 12', email: 'bamba@sgs.edu'},
-                {id: 3, nom: 'COULIBALY', prenoms: 'Ibrahim', specialite: 'Anglais', telephone: '+225 07 08 09 10 13', email: 'coulibaly@sgs.edu'}
-            ],
-            matieres: [
-                {id: 1, nom: 'Mathématiques', coefficient: 4, description: 'Sciences exactes'},
-                {id: 2, nom: 'Français', coefficient: 4, description: 'Langues'},
-                {id: 3, nom: 'Anglais', coefficient: 3, description: 'Langues'},
-                {id: 4, nom: 'Sciences Physiques', coefficient: 3, description: 'Sciences'},
-                {id: 5, nom: 'SVT', coefficient: 2, description: 'Sciences de la Vie'},
-                {id: 6, nom: 'Histoire-Géographie', coefficient: 3, description: 'Sciences humaines'},
-                {id: 7, nom: 'EPS', coefficient: 1, description: 'Sport'}
-            ],
-            notes: [
-                {id: 1, eleve: 'KOUASSI Jean-Pierre', matiere: 'Mathématiques', note: 15.5, sur: 20, type: 'Devoir', periode: 'Trimestre 1', date: '15/01/2026'},
-                {id: 2, eleve: 'DIALLO Fatou', matiere: 'Français', note: 14.0, sur: 20, type: 'Composition', periode: 'Trimestre 1', date: '14/01/2026'},
-                {id: 3, eleve: 'TRAORE Mamadou', matiere: 'Anglais', note: 16.5, sur: 20, type: 'Contrôle', periode: 'Trimestre 1', date: '13/01/2026'}
-            ]
+        // Fonctions JavaScript pour la logique de l'application
+        let etablissement = {
+            parametres: {
+                nomEtablissement: "",
+                logoEtablissement: "",
+                adresseEtablissement: "",
+                telephoneEtablissement: "",
+                emailEtablissement: "",
+                anneeScolaire: "",
+                directeurGeneral: "",
+                censeurProviseur: "",
+                intendantEconome: "",
+                deviseSlogan: ""
+            },
+            classes: [],
+            eleves: [],
+            enseignants: [],
+            matieres: [],
+            notes: []
         };
 
-        function showPage(page) {
-            document.querySelectorAll('.menu-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
+        // Fonction pour afficher une section et masquer les autres
+        function showSection(sectionId) {
+            const sections = document.querySelectorAll('section');
+            sections.forEach(section => section.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+        }
 
-            switch(page) {
-                case 'dashboard': showDashboard(); break;
-                case 'classes': showClasses(); break;
-                case 'eleves': showEleves(); break;
-                case 'enseignants': showEnseignants(); break;
-                case 'matieres': showMatieres(); break;
-                case 'notes': showNotes(); break;
-                case 'bulletins': showBulletins(); break;
-                case 'statistiques': showStatistiques(); break;
-                case 'about': showAbout(); break;
+        // Fonction pour enregistrer les paramètres de l'établissement
+        function saveParameters() {
+            etablissement.parametres.nomEtablissement = document.getElementById("nomEtablissement").value;
+            etablissement.parametres.logoEtablissement = document.getElementById("logoEtablissement").value;
+            etablissement.parametres.adresseEtablissement = document.getElementById("adresseEtablissement").value;
+            etablissement.parametres.telephoneEtablissement = document.getElementById("telephoneEtablissement").value;
+            etablissement.parametres.emailEtablissement = document.getElementById("emailEtablissement").value;
+            etablissement.parametres.anneeScolaire = document.getElementById("anneeScolaire").value;
+            etablissement.parametres.directeurGeneral = document.getElementById("directeurGeneral").value;
+            etablissement.parametres.censeurProviseur = document.getElementById("censeurProviseur").value;
+            etablissement.parametres.intendantEconome = document.getElementById("intendantEconome").value;
+            etablissement.parametres.deviseSlogan = document.getElementById("deviseSlogan").value;
+
+            alert("Paramètres enregistrés!");
+        }
+
+        //Fonction pour ajouter une class
+        function ajouterClasse() {
+            let nomClasse = prompt("Nom de la classe:");
+            if (nomClasse) {
+                let serieClasse = prompt("Série (A, C, D, etc.):");
+                let effectifMax = prompt("Effectif maximum:");
+
+                let nouvelleClasse = {
+                    nom: nomClasse,
+                    serie: serieClasse,
+                    effectifMax: effectifMax
+                };
+
+                etablissement.classes.push(nouvelleClasse);
+                afficherClasses();
             }
         }
 
-        function showDashboard() {
-            const content = document.getElementById('content');
-            content.innerHTML = `
-                <h2 class="page-title">TABLEAU DE BORD</h2>
-                
-                <div class="stats-container">
-                    <div class="stat-card success">
-                        <div class="stat-number">${data.classes.length}</div>
-                        <div class="stat-label">Classes</div>
-                    </div>
-                    <div class="stat-card primary">
-                        <div class="stat-number">${data.eleves.length}</div>
-                        <div class="stat-label">Élèves</div>
-                    </div>
-                    <div class="stat-card warning">
-                        <div class="stat-number">${data.enseignants.length}</div>
-                        <div class="stat-label">Enseignants</div>
-                    </div>
-                    <div class="stat-card danger">
-                        <div class="stat-number">${data.notes.length}</div>
-                        <div class="stat-label">Notes</div>
-                    </div>
-                </div>
+        // Fonction pour afficher les classes dans le tableau
+        function afficherClasses() {
+            let listeClasses = document.getElementById("listeClasses");
+            listeClasses.innerHTML = "";
 
-                <div class="activity-box">
-                    <h3>📋 Activités Récentes</h3>
-                    <div class="activity-item">• ${new Date().toLocaleDateString('fr-FR')} ${new Date().toLocaleTimeString('fr-FR')} - Application démarrée</div>
-                    <div class="activity-item">• Base de données: ${data.classes.length} classes actives</div>
-                    <div class="activity-item">• Total élèves inscrits: ${data.eleves.length}</div>
-                    <div class="activity-item">• Total notes enregistrées: ${data.notes.length}</div>
-                    <div class="activity-item">• Système opérationnel - Aucune erreur détectée</div>
-                </div>
-            `;
+            etablissement.classes.forEach((classe, index) => {
+                let row = listeClasses.insertRow();
+                let cellNom = row.insertCell(0);
+                let cellSerie = row.insertCell(1);
+                let cellEffectifMax = row.insertCell(2);
+                let cellActions = row.insertCell(3);
+
+                cellNom.innerHTML = classe.nom;
+                cellSerie.innerHTML = classe.serie;
+                cellEffectifMax.innerHTML = classe.effectifMax;
+                cellActions.innerHTML = `<button onclick="supprimerClasse(${index})">Supprimer</button>`;
+            });
         }
 
-        function showClasses() {
-            const content = document.getElementById('content');
-            let rows = data.classes.map(c => `
-                <tr>
-                    <td>${c.id}</td>
-                    <td><strong>${c.nom}</strong></td>
-                    <td>${c.niveau}</td>
-                    <td>${c.effectif_max}</td>
-                    <td><strong style="color: #27ae60">${c.effectif}</strong></td>
-                </tr>
-            `).join('');
-
-            content.innerHTML = `
-                <h2 class="page-title">GESTION DES CLASSES</h2>
-                
-                <div class="action-buttons">
-                    <button class="btn btn-success" onclick="alert('➕ Ajouter une nouvelle classe')">➕ Nouvelle Classe</button>
-                    <button class="btn btn-primary" onclick="showClasses()">🔄 Actualiser</button>
-                </div>
-
-                <div class="data-table">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Nom</th>
-                                <th>Niveau</th>
-                                <th>Effectif Max</th>
-                                <th>Effectif Actuel</th>
-                            </tr>
-                        </thead>
-                        <tbody>${rows}</tbody>
-                    </table>
-                </div>
-            `;
+        //Fonction pour supprimer une class
+        function supprimerClasse(index) {
+            etablissement.classes.splice(index, 1);
+            afficherClasses();
         }
 
-        function showEleves() {
-            const content = document.getElementById('content');
-            
-            function renderTable(eleves) {
-                return eleves.map(e => `
-                    <tr>
-                        <td>${e.id}</td>
-                        <td>${e.matricule}</td>
-                        <td><strong>${e.nom}</strong></td>
-                        <td>${e.prenoms}</td>
-                        <td>${e.sexe}</td>
-                        <td>${e.classe}</td>
-                        <td>${e.telephone}</td>
-                    </tr>
-                `).join('');
+        // Fonction pour ajouter un élève
+        function ajouterEleve() {
+            let matricule = prompt("Numéro matricule:");
+            if (matricule) {
+                let nom = prompt("Nom:");
+                let prenom = prompt("Prénom:");
+                let classe = prompt("Classe:");
+
+                let nouvelEleve = {
+                    matricule: matricule,
+                    nom: nom,
+                    prenom: prenom,
+                    classe: classe
+                };
+
+                etablissement.eleves.push(nouvelEleve);
+                afficherEleves();
             }
-
-            content.innerHTML = `
-                <h2 class="page-title">GESTION DES ÉLÈVES</h2>
-                
-                <div class="action-buttons">
-                    <button class="btn btn-success" onclick="alert('➕ Ajouter un nouvel élève')">➕ Nouvel Élève</button>
-                    <button class="btn btn-primary" onclick="showEleves()">🔄 Actualiser</button>
-                    <button class="btn btn-warning" onclick="alert('📥 Export CSV effectué!')">📥 Exporter CSV</button>
-                </div>
-
-                <div class="search-box">
-                    <input type="text" placeholder="🔍 Rechercher un élève..." oninput="filterEleves(this.value)">
-                </div>
-
-                <div class="data-table">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Matricule</th>
-                                <th>Nom</th>
-                                <th>Prénoms</th>
-                                <th>Sexe</th>
-                                <th>Classe</th>
-                                <th>Téléphone</th>
-                            </tr>
-                        </thead>
-                        <tbody id="elevesTableBody">${renderTable(data.eleves)}</tbody>
-                    </table>
-                </div>
-            `;
         }
 
-        function filterEleves(term) {
-            const filtered = data.eleves.filter(e => 
-                e.nom.toLowerCase().includes(term.toLowerCase()) ||
-                e.prenoms.toLowerCase().includes(term.toLowerCase()) ||
-                e.matricule.toLowerCase().includes(term.toLowerCase())
-            );
+        // Fonction pour afficher les élèves dans le tableau
+        function afficherEleves() {
+            let listeEleves = document.getElementById("listeEleves");
+            listeEleves.innerHTML = "";
 
-            const tbody = document.getElementById('elevesTableBody');
-            tbody.innerHTML = filtered.map(e => `
-                <tr>
-                    <td>${e.id}</td>
-                    <td>${e.matricule}</td>
-                    <td><strong>${e.nom}</strong></td>
-                    <td>${e.prenoms}</td>
-                    <td>${e.sexe}</td>
-                    <td>${e.classe}</td>
-                    <td>${e.telephone}</td>
-                </tr>
-            `).join('') || '<tr><td colspan="7" style="text-align:center; padding:20px; color:#999">Aucun élève trouvé</td></tr>';
+            etablissement.eleves.forEach((eleve, index) => {
+                let row = listeEleves.insertRow();
+                let cellMatricule = row.insertCell(0);
+                let cellNom = row.insertCell(1);
+                let cellPrenom = row.insertCell(2);
+                let cellClasse = row.insertCell(3);
+                let cellActions = row.insertCell(4);
+
+                cellMatricule.innerHTML = eleve.matricule;
+                cellNom.innerHTML = eleve.nom;
+                cellPrenom.innerHTML = eleve.prenom;
+                cellClasse.innerHTML = eleve.classe;
+                cellActions.innerHTML = `<button onclick="supprimerEleve(${index})">Supprimer</button>`;
+            });
         }
 
-        function showEnseignants() {
-            const content = document.getElementById('content');
-            let rows = data.enseignants.map(e => `
-                <tr>
-                    <td>${e.id}</td>
-                    <td><strong>${e.nom}</strong></td>
-                    <td>${e.prenoms}</td>
-                    <td>${e.specialite}</td>
-                    <td>${e.telephone}</td>
-                    <td>${e.email}</td>
-                </tr>
-            `).join('');
-
-            content.innerHTML = `
-                <h2 class="page-title">GESTION DES ENSEIGNANTS</h2>
-                
-                <div class="action-buttons">
-                    <button class="btn btn-success" onclick="alert('➕ Ajouter un nouvel enseignant')">➕ Nouvel Enseignant</button>
-                    <button class="btn btn-primary" onclick="showEnseignants()">🔄 Actualiser</button>
-                </div>
-
-                <div class="data-table">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Nom</th>
-                                <th>Prénoms</th>
-                                <th>Spécialité</th>
-                                <th>Téléphone</th>
-                                <th>Email</th>
-                            </tr>
-                        </thead>
-                        <tbody>${rows}</tbody>
-                    </table>
-                </div>
-            `;
+        // Fonction pour supprimer un élève
+        function supprimerEleve(index) {
+            etablissement.eleves.splice(index, 1);
+            afficherEleves();
         }
 
-        function showMatieres() {
-            const content = document.getElementById('content');
-            let rows = data.matieres.map(m => `
-                <tr>
-                    <td>${m.id}</td>
-                    <td><strong>${m.nom}</strong></td>
-                    <td><strong style="color: #e74c3c">${m.coefficient}</strong></td>
-                    <td>${m.description}</td>
-                </tr>
-            `).join('');
+        // Fonction pour ajouter un enseignant
+        function ajouterEnseignant() {
+            let nom = prompt("Nom de l'enseignant:");
+            if (nom) {
+                let prenom = prompt("Prénom de l'enseignant:");
+                let matiere = prompt("Matière enseignée:");
 
-            content.innerHTML = `
-                <h2 class="page-title">GESTION DES MATIÈRES</h2>
-                
-                <div class="action-buttons">
-                    <button class="btn btn-success" onclick="alert('➕ Ajouter une nouvelle matière')">➕ Nouvelle Matière</button>
-                    <button class="btn btn-primary" onclick="showMatieres()">🔄 Actualiser</button>
-                </div>
+                let nouvelEnseignant = {
+                    nom: nom,
+                    prenom: prenom,
+                    matiere: matiere
+                };
 
-                <div class="data-table">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Nom</th>
-                                <th>Coefficient</th>
-                                <th>Description</th>
-                            </tr>
-                        </thead>
-                        <tbody>${rows}</tbody>
-                    </table>
-                </div>
-            `;
+                etablissement.enseignants.push(nouvelEnseignant);
+                afficherEnseignants();
+            }
         }
 
-        function showNotes() {
-            const content = document.getElementById('content');
-            let rows = data.notes.map(n => `
-                <tr>
-                    <td>${n.id}</td>
-                    <td>${n.eleve}</td>
-                    <td>${n.matiere}</td>
-                    <td><strong style="color: #27ae60">${n.note}</strong></td>
-                    <td>${n.sur}</td>
-                    <td>${n.type}</td>
-                    <td>${n.periode}</td>
-                    <td>${n.date}</td>
-                </tr>
-            `).join('');
+        // Fonction pour afficher les enseignants dans le tableau
+        function afficherEnseignants() {
+            let listeEnseignants = document.getElementById("listeEnseignants");
+            listeEnseignants.innerHTML = "";
 
-            content.innerHTML = `
-                <h2 class="page-title">GESTION DES NOTES</h2>
-                
-                <div class="action-buttons">
-                    <button class="btn btn-success" onclick="alert('➕ Saisir une nouvelle note')">➕ Saisir Note</button>
-                    <button class="btn btn-primary" onclick="showNotes()">🔄 Actualiser</button>
-                </div>
+            etablissement.enseignants.forEach((enseignant, index) => {
+                let row = listeEnseignants.insertRow();
+                let cellNom = row.insertCell(0);
+                let cellPrenom = row.insertCell(1);
+                let cellMatiere = row.insertCell(2);
+                let cellActions = row.insertCell(3);
 
-                <div class="data-table">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Élève</th>
-                                <th>Matière</th>
-                                <th>Note</th>
-                                <th>Sur</th>
-                                <th>Type</th>
-                                <th>Période</th>
-                                <th>Date</th>
-                            </tr>
-                        </thead>
-                        <tbody>${rows}</tbody>
-                    </table>
-                </div>
-            `;
+                cellNom.innerHTML = enseignant.nom;
+                cellPrenom.innerHTML = enseignant.prenom;
+                cellMatiere.innerHTML = enseignant.matiere;
+                cellActions.innerHTML = `<button onclick="supprimerEnseignant(${index})">Supprimer</button>`;
+            });
         }
 
-        function showBulletins() {
-            const content = document.getElementById('content');
-            content.innerHTML = `
-                <h2 class="page-title">GÉNÉRATION DES BULLETINS</h2>
-                
-                <div class="info-section">
-                    <h2>Paramètres de génération</h2>
-                    
-                    <div class="form-group">
-                        <label>Sélectionner une classe:</label>
-                        <select>
-                            ${data.classes.map(c => `<option>${c.nom}</option>`).join('')}
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Sélectionner une période:</label>
-                        <select>
-                            <option>Trimestre 1</option>
-                            <option>Trimestre 2</option>
-                            <option>Trimestre 3</option>
-                        </select>
-                    </div>
-                    
-                    <button class="btn btn-success" style="margin-top: 20px; padding: 15px 40px; font-size: 16px;" 
-                            onclick="alert('📄 Génération des bulletins en cours...')">
-                        📄 GÉNÉRER LES BULLETINS
-                    </button>
-                </div>
-            `;
+        // Fonction pour supprimer un enseignant
+        function supprimerEnseignant(index) {
+            etablissement.enseignants.splice(index, 1);
+            afficherEnseignants();
         }
 
-        function showStatistiques() {
-            const content = document.getElementById('content');
-            
-            let classeStats = data.classes.map(c => `
-                <div class="stat-row">
-                    <strong>${c.nom}</strong>
-                    <span>${c.effectif} élèves</span>
-                </div>
-            `).join('');
+        // Fonction pour ajouter une matière
+        function ajouterMatiere() {
+            let nom = prompt("Nom de la matière:");
+            if (nom) {
+                let coefficient = prompt("Coefficient de la matière:");
+                let classe = prompt("Classe concernée:");
+                let enseignant = prompt("Enseignant responsable:");
 
-            content.innerHTML = `
-                <h2 class="page-title">STATISTIQUES</h2>
-                
-                <div class="info-section">
-                    <h2>📊 Effectifs par Classe</h2>
-                    ${classeStats}
-                </div>
+                let nouvelleMatiere = {
+                    nom: nom,
+                    coefficient: coefficient,
+                    classe: classe,
+                    enseignant: enseignant
+                };
 
-                <div class="info-section">
-                    <h2>📈 Moyennes Générales par Matière</h2>
-                    <div class="stat-row">
-                        <strong>Mathématiques</strong>
-                        <span style="color: #27ae60; font-weight: bold;">15.5/20</span>
-                    </div>
-                    <div class="stat-row">
-                        <strong>Français</strong>
-                        <span style="color: #27ae60; font-weight: bold;">14.0/20</span>
-                    </div>
-                    <div class="stat-row">
-                        <strong>Anglais</strong>
-                        <span style="color: #27ae60; font-weight: bold;">13.8/20</span>
-                    </div>
-                    <div class="stat-row">
-                        <strong>Sciences Physiques</strong>
-                        <span style="color: #f39c12; font-weight: bold;">9.5/20</span>
-                    </div>
-                    <div class="stat-row">
-                        <strong>SVT</strong>
-                        <span style="color: #27ae60; font-weight: bold;">12.3/20</span>
-                    </div>
-                </div>
-            `;
+                etablissement.matieres.push(nouvelleMatiere);
+                afficherMatieres();
+            }
         }
 
-        function showAbout() {
-            const content = document.getElementById('content');
-            content.innerHTML = `
-                <div class="info-section" style="text-align: center;">
-                    <h1 style="font-size: 32px; color: #2c3e50; margin-bottom: 15px;">
-                        🏫 SGS - Système de Gestion Scolaire
-                    </h1>
-                    <p style="font-size: 18px; color: #7f8c8d; margin-bottom: 40px;">Version 1.0</p>
-                    
-                    <div style="text-align: left; max-width: 700px; margin: 0 auto;">
-                        <h3 style="color: #2c3e50; margin: 30px 0 15px 0; font-size: 20px;">✨ Fonctionnalités</h3>
-                        <ul class="features-list">
-                            <li>✓ Gestion complète des classes</li>
-                            <li>✓ Gestion des élèves avec recherche avancée</li>
-                            <li>✓ Gestion des enseignants</li>
-                            <li>✓ Gestion des matières et coefficients</li>
-                            <li>✓ Saisie et consultation des notes</li>
-                            <li>✓ Génération de bulletins scolaires</li>
-                            <li>✓ Statistiques et rapports détaillés</li>
-                            <li>✓ Export des données en CSV</li>
-                            <li>✓ Interface moderne et intuitive</li>
-                            <li>✓ Système sécurisé et performant</li>
-                        </ul>
+        // Fonction pour afficher les matières dans le tableau
+        function afficherMatieres() {
+            let listeMatieres = document.getElementById("listeMatieres");
+            listeMatieres.innerHTML = "";
 
-                        <h3 style="color: #2c3e50; margin: 30px 0 15px 0; font-size: 20px;">🔧 Technologies</h3>
-                        <div class="stat-row">
-                            <strong>Version Python</strong>
-                            <span>Python 3.x + Tkinter + SQLite3</span>
-                        </div>
-                        <div class="stat-row">
-                            <strong>Version Web (Démo)</strong>
-                            <span>HTML5 + CSS3 + JavaScript</span>
-                        </div>
-                        <div class="stat-row">
-                            <strong>Base de données</strong>
-                            <span>SQLite (embarquée)</span>
-                        </div>
+            etablissement.matieres.forEach((matiere, index) => {
+                let row = listeMatieres.insertRow();
+                let cellNom = row.insertCell(0);
+                let cellCoefficient = row.insertCell(1);
+                let cellClasse = row.insertCell(2);
+                let cellEnseignant = row.insertCell(3);
+                let cellActions = row.insertCell(4);
 
-                        <h3 style="color: #2c3e50; margin: 30px 0 15px 0; font-size: 20px;">📋 Caractéristiques</h3>
-                        <p style="line-height: 2; color: #555; background: #f8f9fa; padding: 20px; border-radius: 8px;">
-                            <strong>•</strong> Interface utilisateur moderne et ergonomique<br>
-                            <strong>•</strong> Validation complète des données saisies<br>
-                            <strong>•</strong> Système de sauvegarde automatique<br>
-                            <strong>•</strong> Support multi-utilisateurs avec authentification<br>
-                            <strong>•</strong> Rapports et statistiques en temps réel<br>
-                            <strong>•</strong> Adapté aux besoins des écoles africaines<br>
-                            <strong>•</strong> 100% gratuit et open-source
-                        </p>
-
-                        <div style="margin-top: 50px; padding: 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-                                    border-radius: 10px; color: white; text-align: center;">
-                            <p style="font-size: 18px; font-weight: bold; margin-bottom: 15px;">
-                                Développé avec ❤️ pour l'éducation africaine
-                            </p>
-                            <p style="font-size: 14px; opacity: 0.9;">
-                                © 2026 - SGS - Tous droits réservés
-                            </p>
-                            <p style="font-size: 12px; margin-top: 15px; opacity: 0.8;">
-                                Pour obtenir la version Python complète, contactez votre administrateur
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            `;
+                cellNom.innerHTML = matiere.nom;
+                cellCoefficient.innerHTML = matiere.coefficient;
+                cellClasse.innerHTML = matiere.classe;
+                cellEnseignant.innerHTML = matiere.enseignant;
+                cellActions.innerHTML = `<button onclick="supprimerMatiere(${index})">Supprimer</button>`;
+            });
         }
 
-        // Initialiser avec le tableau de bord
-        showDashboard();
-    </script>
-</body>
-</html>
+        // Fonction pour supprimer une matière
+        function supprimerMatiere(index) {
+            etablissement.matieres.splice(index, 1);
+            afficherMatieres();
+        }
+
+        // Fonction pour afficher les élèves pour la saisie des notes
+        function afficherElevesPourNotes() {
+            let classeSelectionnee = document.getElementById("classeNotes").value;
+            let listeNotes = document.getElementById("listeNotes");
+            listeNotes.innerHTML = "";
+
+            // Filtrer les élèves par la classe sélectionnée
+            let elevesDeLaClasse = etablissement.eleves.filter(eleve => eleve.classe === classeSelectionnee);
+
+            elevesDeLaClasse.forEach(eleve => {
+                // Pour chaque matière, afficher une ligne avec les notes
+                etablissement.matieres.forEach(matiere => {
+                    let row = listeNotes.insertRow();
+                    let cellNomEleve = row.insertCell(0);
+                    let cellMatiere = row.insertCell(1);
+                    let cellNote1 = row.insertCell(2);
+                    let cellNote2 = row.insertCell(3);
+                    let cellNote3 = row.insertCell(4);
+                    let cellMoyenne = row.insertCell(5);
+
+                    cellNomEleve.innerHTML = eleve.nom + " " + eleve.prenom;
+                    cellMatiere.innerHTML = matiere.nom;
+
+                    // Créer des champs de saisie pour les notes
+                    cellNote1.innerHTML = `<input type="number" onchange="calculerMoyenne(this)">`;
+                    cellNote2.innerHTML = `<input type="number" onchange="calculerMoyenne(this)">`;
+                    cellNote3.innerHTML = `<input type="number" onchange="calculerMoyenne(this)">`;
+                    cellMoyenne.innerHTML = "0"; // Valeur par défaut
+                });
+            });
+        }
+
+        //Fonction pour calculer la moyenne
+        function calculerMoyenne(input) {
+            let row = input.parentNode.parentNode;
+            let note1 = parseFloat(row.cells[2].firstChild.value) || 0;
+            let note2 = parseFloat(row.cells[3].firstChild.value) || 0;
+            let note3 = parseFloat(row.cells[4].firstChild.value) || 0;
+
+            let moyenne = (note1 + note2 + note3) / 3;
+            row.cells[5].innerHTML = moyenne.toFixed(2); // Afficher la moyenne avec 2 décimales
+        }
+
+        // Fonction pour afficher les élèves pour les bulletins
+        function afficherElevesPourBulletins() {
+            let classeSelectionnee = document.getElementById("classeBulletins").value;
+            let listeBulletins = document.getElementById("listeBulletins");
+            listeBulletins.innerHTML = "";
+
+            let elevesDe
