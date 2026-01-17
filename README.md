@@ -18,6 +18,11 @@ th {background:#2c3e50; color:#fff;}
 input, select {padding:5px; margin:5px;}
 button.add-btn {background:#1abc9c; color:#fff; border:none; padding:5px 10px; cursor:pointer;}
 button.add-btn:hover {background:#16a085;}
+.bulletin {border:1px solid #000; margin:10px; padding:10px; page-break-inside: avoid;}
+@media print {
+  #sidebar, button.add-btn {display:none;}
+  body {margin:0;}
+}
 </style>
 </head>
 <body>
@@ -39,7 +44,6 @@ button.add-btn:hover {background:#16a085;}
 <h2>Tableau de bord</h2>
 <p>Bienvenue dans le logiciel de gestion scolaire !</p>
 </div>
-
 <div id="parametres-section" class="section" style="display:none">
 <h2>Paramètres de l'établissement</h2>
 <form id="paramForm">
@@ -52,7 +56,6 @@ button.add-btn:hover {background:#16a085;}
 <button type="button" onclick="saveParametres()" class="add-btn">Enregistrer</button>
 </form>
 </div>
-
 <div id="classes-section" class="section" style="display:none">
 <h2>Gestion des classes</h2>
 <input type="text" id="newClassName" placeholder="Nom de la classe">
@@ -61,7 +64,6 @@ button.add-btn:hover {background:#16a085;}
 <tr><th>Nom de la classe</th><th>Actions</th></tr>
 </table>
 </div>
-
 <div id="eleves-section" class="section" style="display:none">
 <h2>Gestion des élèves</h2>
 <input type="text" id="eleveNom" placeholder="Nom et prénom">
@@ -78,7 +80,6 @@ button.add-btn:hover {background:#16a085;}
 <tr><th>Nom</th><th>Sexe</th><th>Date de naissance</th><th>Classe</th><th>Parent</th><th>Contact</th></tr>
 </table>
 </div>
-
 <div id="enseignants-section" class="section" style="display:none">
 <h2>Gestion des enseignants</h2>
 <input type="text" id="ensNom" placeholder="Nom et prénom">
@@ -97,7 +98,6 @@ button.add-btn:hover {background:#16a085;}
 <tr><th>Nom</th><th>Sexe</th><th>Matière</th><th>Classe</th><th>Statut</th></tr>
 </table>
 </div>
-
 <div id="matieres-section" class="section" style="display:none">
 <h2>Gestion des matières</h2>
 <input type="text" id="matiereNom" placeholder="Nom de la matière">
@@ -109,21 +109,19 @@ button.add-btn:hover {background:#16a085;}
 <tr><th>Nom</th><th>Coefficient</th><th>Classe</th><th>Enseignant</th></tr>
 </table>
 </div>
-
 <div id="notes-section" class="section" style="display:none">
 <h2>Gestion des notes</h2>
 <select id="selectClasseNotes"></select>
 <button onclick="loadElevesNotes()" class="add-btn">Charger Élèves</button>
 <div id="notesContainer"></div>
 </div>
-
 <div id="bulletins-section" class="section" style="display:none">
 <h2>Bulletins scolaires</h2>
 <select id="selectClasseBulletins"></select>
 <button onclick="loadElevesBulletins()" class="add-btn">Afficher Bulletins</button>
+<button onclick="window.print()" class="add-btn">Imprimer Bulletins</button>
 <div id="bulletinsContainer"></div>
 </div>
-
 <script>
 let classes = [];
 let eleves = [];
@@ -289,7 +287,6 @@ function loadElevesNotes(){
 
 function saveNotes(eleveNom, div){
   notes[eleveNom]={};
-  div.querySelectorAll('h4')[0];
   matieres.forEach((m,i)=>{
     if(m.classe===document.getElementById('selectClasseNotes').value){
       let inputs = div.querySelectorAll('input');
@@ -307,7 +304,7 @@ function loadElevesBulletins(){
   let classeEleves=eleves.filter(e=>e.classe===classe);
   classeEleves.forEach(e=>{
     let div=document.createElement('div');
-    div.style.border='1px solid #000'; div.style.margin='10px'; div.style.padding='10px';
+    div.className='bulletin';
     div.innerHTML=`<h3>${e.nom}</h3>`;
     let total=0; let count=0;
     matieres.filter(m=>m.classe===classe).forEach(m=>{
@@ -318,6 +315,9 @@ function loadElevesBulletins(){
     });
     let moyenneGen = total/count;
     div.innerHTML+=`<b>Moyenne Générale: ${moyenneGen.toFixed(2)}</b><br>`;
+    let param = JSON.parse(localStorage.getItem('parametres') || '{}');
+    div.innerHTML+=`<p>${param.nom || 'Établissement'} - ${param.annee || ''}</p>`;
+    div.innerHTML+=`<p>Directeur: ${param.directeur || ''}</p>`;
     container.appendChild(div);
   });
 }
@@ -325,10 +325,4 @@ function loadElevesBulletins(){
 // Load saved data
 if(localStorage.getItem('classes')) classes=JSON.parse(localStorage.getItem('classes'));
 if(localStorage.getItem('eleves')) eleves=JSON.parse(localStorage.getItem('eleves'));
-if(localStorage.getItem('enseignants')) enseignants=JSON.parse(localStorage.getItem('enseignants'));
-if(localStorage.getItem('matieres')) matieres=JSON.parse(localStorage.getItem('matieres'));
-if(localStorage.getItem('notes')) notes=JSON.parse(localStorage.getItem('notes'));
-renderClasses(); renderEleves(); renderEnseignants(); renderMatieres();
-</script>
-</body>
-</html>
+if(local
