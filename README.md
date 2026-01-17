@@ -565,4 +565,238 @@
                                 <th>Nom</th>
                                 <th>Prénoms</th>
                                 <th>Spécialité</th>
-               
+                                <th>Téléphone</th>
+                                <th>Email</th>
+                            </tr>
+                        </thead>
+                        <tbody>${rows}</tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        function showMatieres() {
+            const content = document.getElementById('content');
+            let rows = data.matieres.map(m => `
+                <tr>
+                    <td>${m.id}</td>
+                    <td><strong>${m.nom}</strong></td>
+                    <td><strong style="color: #e74c3c">${m.coefficient}</strong></td>
+                    <td>${m.description}</td>
+                </tr>
+            `).join('');
+
+            content.innerHTML = `
+                <h2 class="page-title">GESTION DES MATIÈRES</h2>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-success" onclick="alert('➕ Ajouter une nouvelle matière')">➕ Nouvelle Matière</button>
+                    <button class="btn btn-primary" onclick="showMatieres()">🔄 Actualiser</button>
+                </div>
+
+                <div class="data-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nom</th>
+                                <th>Coefficient</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>${rows}</tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        function showNotes() {
+            const content = document.getElementById('content');
+            let rows = data.notes.map(n => `
+                <tr>
+                    <td>${n.id}</td>
+                    <td>${n.eleve}</td>
+                    <td>${n.matiere}</td>
+                    <td><strong style="color: #27ae60">${n.note}</strong></td>
+                    <td>${n.sur}</td>
+                    <td>${n.type}</td>
+                    <td>${n.periode}</td>
+                    <td>${n.date}</td>
+                </tr>
+            `).join('');
+
+            content.innerHTML = `
+                <h2 class="page-title">GESTION DES NOTES</h2>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-success" onclick="alert('➕ Saisir une nouvelle note')">➕ Saisir Note</button>
+                    <button class="btn btn-primary" onclick="showNotes()">🔄 Actualiser</button>
+                </div>
+
+                <div class="data-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Élève</th>
+                                <th>Matière</th>
+                                <th>Note</th>
+                                <th>Sur</th>
+                                <th>Type</th>
+                                <th>Période</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>${rows}</tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        function showBulletins() {
+            const content = document.getElementById('content');
+            content.innerHTML = `
+                <h2 class="page-title">GÉNÉRATION DES BULLETINS</h2>
+                
+                <div class="info-section">
+                    <h2>Paramètres de génération</h2>
+                    
+                    <div class="form-group">
+                        <label>Sélectionner une classe:</label>
+                        <select>
+                            ${data.classes.map(c => `<option>${c.nom}</option>`).join('')}
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Sélectionner une période:</label>
+                        <select>
+                            <option>Trimestre 1</option>
+                            <option>Trimestre 2</option>
+                            <option>Trimestre 3</option>
+                        </select>
+                    </div>
+                    
+                    <button class="btn btn-success" style="margin-top: 20px; padding: 15px 40px; font-size: 16px;" 
+                            onclick="alert('📄 Génération des bulletins en cours...')">
+                        📄 GÉNÉRER LES BULLETINS
+                    </button>
+                </div>
+            `;
+        }
+
+        function showStatistiques() {
+            const content = document.getElementById('content');
+            
+            let classeStats = data.classes.map(c => `
+                <div class="stat-row">
+                    <strong>${c.nom}</strong>
+                    <span>${c.effectif} élèves</span>
+                </div>
+            `).join('');
+
+            content.innerHTML = `
+                <h2 class="page-title">STATISTIQUES</h2>
+                
+                <div class="info-section">
+                    <h2>📊 Effectifs par Classe</h2>
+                    ${classeStats}
+                </div>
+
+                <div class="info-section">
+                    <h2>📈 Moyennes Générales par Matière</h2>
+                    <div class="stat-row">
+                        <strong>Mathématiques</strong>
+                        <span style="color: #27ae60; font-weight: bold;">15.5/20</span>
+                    </div>
+                    <div class="stat-row">
+                        <strong>Français</strong>
+                        <span style="color: #27ae60; font-weight: bold;">14.0/20</span>
+                    </div>
+                    <div class="stat-row">
+                        <strong>Anglais</strong>
+                        <span style="color: #27ae60; font-weight: bold;">13.8/20</span>
+                    </div>
+                    <div class="stat-row">
+                        <strong>Sciences Physiques</strong>
+                        <span style="color: #f39c12; font-weight: bold;">9.5/20</span>
+                    </div>
+                    <div class="stat-row">
+                        <strong>SVT</strong>
+                        <span style="color: #27ae60; font-weight: bold;">12.3/20</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        function showAbout() {
+            const content = document.getElementById('content');
+            content.innerHTML = `
+                <div class="info-section" style="text-align: center;">
+                    <h1 style="font-size: 32px; color: #2c3e50; margin-bottom: 15px;">
+                        🏫 SGS - Système de Gestion Scolaire
+                    </h1>
+                    <p style="font-size: 18px; color: #7f8c8d; margin-bottom: 40px;">Version 1.0</p>
+                    
+                    <div style="text-align: left; max-width: 700px; margin: 0 auto;">
+                        <h3 style="color: #2c3e50; margin: 30px 0 15px 0; font-size: 20px;">✨ Fonctionnalités</h3>
+                        <ul class="features-list">
+                            <li>✓ Gestion complète des classes</li>
+                            <li>✓ Gestion des élèves avec recherche avancée</li>
+                            <li>✓ Gestion des enseignants</li>
+                            <li>✓ Gestion des matières et coefficients</li>
+                            <li>✓ Saisie et consultation des notes</li>
+                            <li>✓ Génération de bulletins scolaires</li>
+                            <li>✓ Statistiques et rapports détaillés</li>
+                            <li>✓ Export des données en CSV</li>
+                            <li>✓ Interface moderne et intuitive</li>
+                            <li>✓ Système sécurisé et performant</li>
+                        </ul>
+
+                        <h3 style="color: #2c3e50; margin: 30px 0 15px 0; font-size: 20px;">🔧 Technologies</h3>
+                        <div class="stat-row">
+                            <strong>Version Python</strong>
+                            <span>Python 3.x + Tkinter + SQLite3</span>
+                        </div>
+                        <div class="stat-row">
+                            <strong>Version Web (Démo)</strong>
+                            <span>HTML5 + CSS3 + JavaScript</span>
+                        </div>
+                        <div class="stat-row">
+                            <strong>Base de données</strong>
+                            <span>SQLite (embarquée)</span>
+                        </div>
+
+                        <h3 style="color: #2c3e50; margin: 30px 0 15px 0; font-size: 20px;">📋 Caractéristiques</h3>
+                        <p style="line-height: 2; color: #555; background: #f8f9fa; padding: 20px; border-radius: 8px;">
+                            <strong>•</strong> Interface utilisateur moderne et ergonomique<br>
+                            <strong>•</strong> Validation complète des données saisies<br>
+                            <strong>•</strong> Système de sauvegarde automatique<br>
+                            <strong>•</strong> Support multi-utilisateurs avec authentification<br>
+                            <strong>•</strong> Rapports et statistiques en temps réel<br>
+                            <strong>•</strong> Adapté aux besoins des écoles africaines<br>
+                            <strong>•</strong> 100% gratuit et open-source
+                        </p>
+
+                        <div style="margin-top: 50px; padding: 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                                    border-radius: 10px; color: white; text-align: center;">
+                            <p style="font-size: 18px; font-weight: bold; margin-bottom: 15px;">
+                                Développé avec ❤️ pour l'éducation africaine
+                            </p>
+                            <p style="font-size: 14px; opacity: 0.9;">
+                                © 2026 - SGS - Tous droits réservés
+                            </p>
+                            <p style="font-size: 12px; margin-top: 15px; opacity: 0.8;">
+                                Pour obtenir la version Python complète, contactez votre administrateur
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Initialiser avec le tableau de bord
+        showDashboard();
+    </script>
+</body>
+</html>
