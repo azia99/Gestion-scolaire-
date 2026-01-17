@@ -1,410 +1,185 @@
-import React, { useState, useEffect } from 'react';
+        // Suite et fin du script SGE
 
-const SGE = () => {
-  const [currentSection, setCurrentSection] = useState('dashboard');
-  const [activeModal, setActiveModal] = useState(null);
-  const [parametres, setParametres] = useState({
-    nomEtablissement: 'Établissement Scolaire',
-    anneeScolaire: '2025-2026',
-    adresse: '',
-    telephone: '',
-    email: '',
-    directeur: '',
-    censeur: '',
-    devise: 'Excellence et Discipline'
-  });
-  const [classes, setClasses] = useState([]);
-  const [matieres, setMatieres] = useState([]);
-  const [enseignants, setEnseignants] = useState([]);
-  const [eleves, setEleves] = useState([]);
-  const [notes, setNotes] = useState([]);
-  const [filterClasse, setFilterClasse] = useState('');
-  const [searchEleve, setSearchEleve] = useState('');
-  const [noteClasse, setNoteClasse] = useState('');
-  const [noteMatiere, setNoteMatiere] = useState('');
-  const [bulletinClasse, setBulletinClasse] = useState('');
-  const [bulletinEleve, setBulletinEleve] = useState('');
-  const [bulletinData, setBulletinData] = useState(null);
+        // --- GESTION DES ENSEIGNANTS ---
+        function submitEnseignant(event) {
+            event.preventDefault();
+            const form = event.target;
+            const matieres = Array.from(form.matieres.selectedOptions).map(opt => opt.value);
+            const classes = Array.from(form.classes.selectedOptions).map(opt => opt.value);
+            
+            const enseignant = {
+                nom: form.nomEnseignant.value,
+                prenom: form.prenomEnseignant.value,
+                telephone: form.telEnseignant.value,
+                email: form.emailEnseignant.value,
+                matieres: matieres,
+                classes: classes
+            };
+            
+            db.add('enseignants', enseignant);
+            form.reset();
+            updateAllTables();
+            alert("Enseignant ajouté avec succès !");
+        }
 
-  useEffect(() => {
-    const now = new Date();
-    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    document.getElementById('currentDate').textContent = now.toLocaleDateString('fr-FR', options);
-  }, []);
+        // --- GESTION DES ÉLÈVES ---
+        function submitEleve(event) {
+            event.preventDefault();
+            const form = event.target;
+            const eleve = {
+                matricule: 'MAT' + Date.now().toString().slice(-6),
+                nom: form.nomEleve.value,
+                prenom: form.prenomEleve.value,
+                dateNaissance: form.dateNaiss.value,
+                classe: form.classeEleve.value,
+                sexe: form.sexeEleve.value,
+                parent: form.parentEleve.value,
+                telParent: form.telParent.value
+            };
+            
+            db.add('eleves', eleve);
+            form.reset();
+            updateAllTables();
+            updateStats();
+            alert("Élève inscrit avec succès !");
+        }
 
-  const generateMatricule = () => {
-    const year = new Date().getFullYear();
-    const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
-    return `${year}${random}`;
-  };
-
-  const handleParametresSubmit = (e) => {
-    e.preventDefault();
-    const formData = {
-      nomEtablissement: e.target.nomEtablissement.value,
-      anneeScolaire: e.target.anneeScolaire.value,
-      adresse: e.target.adresse.value,
-      telephone: e.target.telephone.value,
-      email: e.target.email.value,
-      directeur: e.target.directeur.value,
-      censeur: e.target.censeur.value,
-      devise: e.target.devise.value
-    };
-    setParametres(formData);
-    alert('✅ Paramètres enregistrés avec succès !');
-  };
-
-  const handleClasseSubmit = (e) => {
-    e.preventDefault();
-    const newClasse = {
-      id: Date.now(),
-      niveau: e.target.classeNiveau.value,
-      serie: e.target.classeSerie.value,
-      effectifMax: parseInt(e.target.classeEffectifMax.value),
-      effectifActuel: 0
-    };
-    setClasses([...classes, newClasse]);
-    setActiveModal(null);
-    e.target.reset();
-    alert('✅ Classe ajoutée avec succès !');
-  };
-
-  const handleMatiereSubmit = (e) => {
-    e.preventDefault();
-    const selectedClasses = Array.from(e.target.matiereClasses.selectedOptions).map(opt => opt.value);
-    const newMatiere = {
-      id: Date.now(),
-      nom: e.target.matiereNom.value,
-      coefficient: parseFloat(e.target.matiereCoef.value),
-      classes: selectedClasses
-    };
-    setMatieres([...matieres, newMatiere]);
-    setActiveModal(null);
-    e.target.reset();
-    alert('✅ Matière ajoutée avec succès !');
-  };
-
-  const handleEnseignantSubmit = (e) => {
-    e.preventDefault();
-    const newEnseignant = {
-      id: Date.now(),
-      nom: e.target.enseignantNom.value,
-      sexe: e.target.enseignantSexe.value,
-      matiere: e.target.enseignantMatiere.value,
-      contact: e.target.enseignantContact.value,
-      statut: e.target.enseignantStatut.value
-    };
-    setEnseignants([...enseignants, newEnseignant]);
-    setActiveModal(null);
-    e.target.reset();
-    alert('✅ Enseignant ajouté avec succès !');
-  };
-
-  const handleEleveSubmit = (e) => {
-    e.preventDefault();
-    const classeId = e.target.eleveClasse.value;
-    const classe = classes.find(c => c.id === parseInt(classeId));
-    
-    if (classe && classe.effectifActuel >= classe.effectifMax) {
-      alert('❌ Cette classe a atteint son effectif maximum !');
-      return;
-    }
-
-    const newEleve = {
-      id: Date.now(),
-      matricule: generateMatricule(),
-      nom: e.target.eleveNom.value,
-      sexe: e.target.eleveSexe.value,
-      dateNaissance: e.target.eleveDateNaissance.value,
-      classe: classeId,
-      parent: e.target.eleveParent.value,
-      contactParent: e.target.eleveContactParent.value
-    };
-    
-    setEleves([...eleves, newEleve]);
-    setClasses(classes.map(c => 
-      c.id === parseInt(classeId) 
-        ? { ...c, effectifActuel: c.effectifActuel + 1 }
-        : c
-    ));
-    setActiveModal(null);
-    e.target.reset();
-    alert('✅ Élève ajouté avec succès !');
-  };
-
-  const deleteClasse = (id) => {
-    if (confirm('Êtes-vous sûr de vouloir supprimer cette classe ?')) {
-      setClasses(classes.filter(c => c.id !== id));
-    }
-  };
-
-  const deleteMatiere = (id) => {
-    if (confirm('Êtes-vous sûr de vouloir supprimer cette matière ?')) {
-      setMatieres(matieres.filter(m => m.id !== id));
-    }
-  };
-
-  const deleteEnseignant = (id) => {
-    if (confirm('Êtes-vous sûr de vouloir supprimer cet enseignant ?')) {
-      setEnseignants(enseignants.filter(e => e.id !== id));
-    }
-  };
-
-  const deleteEleve = (id) => {
-    if (confirm('Êtes-vous sûr de vouloir supprimer cet élève ?')) {
-      const eleve = eleves.find(e => e.id === id);
-      setEleves(eleves.filter(e => e.id !== id));
-      setClasses(classes.map(c => 
-        c.id === parseInt(eleve.classe) 
-          ? { ...c, effectifActuel: c.effectifActuel - 1 }
-          : c
-      ));
-    }
-  };
-
-  const getClasseName = (classeId) => {
-    const classe = classes.find(c => c.id === parseInt(classeId));
-    return classe ? `${classe.niveau} ${classe.serie}` : '';
-  };
-
-  const getMatiereName = (matiereId) => {
-    const matiere = matieres.find(m => m.id === parseInt(matiereId));
-    return matiere ? matiere.nom : '';
-  };
-
-  const filteredEleves = eleves.filter(eleve => {
-    const matchClasse = !filterClasse || eleve.classe === filterClasse;
-    const matchSearch = !searchEleve || eleve.nom.toLowerCase().includes(searchEleve.toLowerCase()) || eleve.matricule.includes(searchEleve);
-    return matchClasse && matchSearch;
-  });
-
-  const saveNote = (eleveId, value) => {
-    const noteIndex = notes.findIndex(n => 
-      n.eleveId === eleveId && 
-      n.classeId === noteClasse && 
-      n.matiereId === noteMatiere
-    );
-
-    if (noteIndex >= 0) {
-      const newNotes = [...notes];
-      newNotes[noteIndex].note = parseFloat(value) || 0;
-      setNotes(newNotes);
-    } else {
-      setNotes([...notes, {
-        id: Date.now(),
-        eleveId,
-        classeId: noteClasse,
-        matiereId: noteMatiere,
-        note: parseFloat(value) || 0
-      }]);
-    }
-  };
-
-  const getNote = (eleveId) => {
-    const note = notes.find(n => 
-      n.eleveId === eleveId && 
-      n.classeId === noteClasse && 
-      n.matiereId === noteMatiere
-    );
-    return note ? note.note : '';
-  };
-
-  const generateBulletin = () => {
-    if (!bulletinClasse || !bulletinEleve) {
-      alert('❌ Veuillez sélectionner une classe et un élève');
-      return;
-    }
-
-    const eleve = eleves.find(e => e.id === parseInt(bulletinEleve));
-    const classe = classes.find(c => c.id === parseInt(bulletinClasse));
-    const matieresClasse = matieres.filter(m => m.classes.includes(bulletinClasse));
-    
-    const notesEleve = matieresClasse.map(matiere => {
-      const note = notes.find(n => 
-        n.eleveId === parseInt(bulletinEleve) && 
-        n.matiereId === matiere.id.toString()
-      );
-      return {
-        matiere: matiere.nom,
-        coefficient: matiere.coefficient,
-        note: note ? note.note : 0,
-        total: note ? note.note * matiere.coefficient : 0
-      };
-    });
-
-    const totalPoints = notesEleve.reduce((sum, n) => sum + n.total, 0);
-    const totalCoefficients = notesEleve.reduce((sum, n) => sum + n.coefficient, 0);
-    const moyenne = totalCoefficients > 0 ? (totalPoints / totalCoefficients).toFixed(2) : 0;
-
-    setBulletinData({
-      eleve,
-      classe,
-      notes: notesEleve,
-      moyenne,
-      totalPoints,
-      totalCoefficients
-    });
-  };
-
-  return (
-    <div style={{ display: 'flex', height: '100vh', fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif" }}>
-      {/* Sidebar */}
-      <div style={{ width: '260px', background: '#2c3e50', color: 'white', padding: '20px', overflowY: 'auto' }}>
-        <div style={{ textAlign: 'center', marginBottom: '30px', paddingBottom: '20px', borderBottom: '2px solid #34495e' }}>
-          <h1 style={{ fontSize: '24px', color: '#3498db', marginBottom: '5px' }}>🎓 SGE</h1>
-          <p style={{ fontSize: '12px', color: '#95a5a6' }}>Système de Gestion d'Établissement</p>
-        </div>
-        {[
-          { id: 'dashboard', icon: '📊', label: 'Tableau de bord' },
-          { id: 'parametres', icon: '⚙️', label: 'Paramètres' },
-          { id: 'classes', icon: '🏫', label: 'Classes' },
-          { id: 'matieres', icon: '📚', label: 'Matières' },
-          { id: 'enseignants', icon: '👨‍🏫', label: 'Enseignants' },
-          { id: 'eleves', icon: '👨‍🎓', label: 'Élèves' },
-          { id: 'notes', icon: '📝', label: 'Notes' },
-          { id: 'bulletins', icon: '📄', label: 'Bulletins' }
-        ].map(item => (
-          <div
-            key={item.id}
-            onClick={() => setCurrentSection(item.id)}
-            style={{
-              padding: '15px',
-              margin: '8px 0',
-              background: currentSection === item.id ? '#3498db' : '#34495e',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '10px',
-              transition: 'all 0.3s'
-            }}
-          >
-            <span style={{ fontSize: '20px' }}>{item.icon}</span>
-            <span>{item.label}</span>
-          </div>
-        ))}
-      </div>
-
-      {/* Main Content */}
-      <div style={{ flex: 1, padding: '30px', overflowY: 'auto', background: '#ecf0f1' }}>
-        {/* Dashboard */}
-        {currentSection === 'dashboard' && (
-          <div>
-            <div style={{ background: 'white', padding: '20px 30px', borderRadius: '10px', marginBottom: '30px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h2 style={{ color: '#2c3e50', fontSize: '28px' }}>Tableau de bord</h2>
-              <div id="currentDate"></div>
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '20px', marginBottom: '30px' }}>
-              {[
-                { label: 'Total Élèves', value: eleves.length, gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' },
-                { label: 'Total Classes', value: classes.length, gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' },
-                { label: 'Total Enseignants', value: enseignants.length, gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)' },
-                { label: 'Total Matières', value: matieres.length, gradient: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)' }
-              ].map((stat, idx) => (
-                <div key={idx} style={{ background: stat.gradient, color: 'white', padding: '25px', borderRadius: '10px', boxShadow: '0 4px 15px rgba(0,0,0,0.2)' }}>
-                  <h4 style={{ fontSize: '14px', opacity: 0.9, marginBottom: '10px' }}>{stat.label}</h4>
-                  <div style={{ fontSize: '36px', fontWeight: 'bold' }}>{stat.value}</div>
+        // --- GESTION DES NOTES ---
+        function chargerElevesPourNotes() {
+            const classeSelect = document.getElementById('classeNoteSelect');
+            const matiereSelect = document.getElementById('matiereNoteSelect');
+            const container = document.getElementById('elevesNotesList');
+            
+            const eleves = db.get('eleves').filter(e => e.classe === classeSelect.value);
+            
+            container.innerHTML = eleves.map(eleve => `
+                <div class="card">
+                    <h4>${eleve.nom} ${eleve.prenom}</h4>
+                    <div class="notes-grid">
+                        <input type="number" step="0.25" placeholder="Note 1" id="n1_${eleve.matricule}">
+                        <input type="number" step="0.25" placeholder="Note 2" id="n2_${eleve.matricule}">
+                        <input type="number" step="0.25" placeholder="Examen" id="ex_${eleve.matricule}">
+                    </div>
+                    <button class="btn btn-primary" onclick="enregistrerNote('${eleve.matricule}')">Enregistrer</button>
                 </div>
-              ))}
-            </div>
-            <div style={{ background: 'white', padding: '25px', borderRadius: '10px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }}>
-              <h3 style={{ color: '#2c3e50', marginBottom: '20px', paddingBottom: '10px', borderBottom: '2px solid #3498db' }}>Aperçu rapide</h3>
-              <p>Bienvenue dans votre système de gestion scolaire. Utilisez le menu à gauche pour naviguer entre les différentes sections.</p>
-            </div>
-          </div>
-        )}
+            `).join('');
+        }
 
-        {/* Paramètres */}
-        {currentSection === 'parametres' && (
-          <div>
-            <div style={{ background: 'white', padding: '20px 30px', borderRadius: '10px', marginBottom: '30px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }}>
-              <h2 style={{ color: '#2c3e50', fontSize: '28px' }}>Paramètres de l'établissement</h2>
-            </div>
-            <div style={{ background: 'white', padding: '25px', borderRadius: '10px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }}>
-              <h3 style={{ color: '#2c3e50', marginBottom: '20px', paddingBottom: '10px', borderBottom: '2px solid #3498db' }}>Informations générales</h3>
-              <form onSubmit={handleParametresSubmit}>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '20px' }}>
-                  <div style={{ marginBottom: '20px' }}>
-                    <label style={{ display: 'block', marginBottom: '8px', color: '#2c3e50', fontWeight: '600' }}>Nom de l'établissement</label>
-                    <input type="text" name="nomEtablissement" defaultValue={parametres.nomEtablissement} placeholder="Ex: Collège Moderne" style={{ width: '100%', padding: '12px', border: '2px solid #ddd', borderRadius: '6px', fontSize: '14px' }} />
-                  </div>
-                  <div style={{ marginBottom: '20px' }}>
-                    <label style={{ display: 'block', marginBottom: '8px', color: '#2c3e50', fontWeight: '600' }}>Année scolaire</label>
-                    <input type="text" name="anneeScolaire" defaultValue={parametres.anneeScolaire} placeholder="Ex: 2025-2026" style={{ width: '100%', padding: '12px', border: '2px solid #ddd', borderRadius: '6px', fontSize: '14px' }} />
-                  </div>
-                  <div style={{ marginBottom: '20px' }}>
-                    <label style={{ display: 'block', marginBottom: '8px', color: '#2c3e50', fontWeight: '600' }}>Adresse</label>
-                    <input type="text" name="adresse" defaultValue={parametres.adresse} placeholder="Adresse complète" style={{ width: '100%', padding: '12px', border: '2px solid #ddd', borderRadius: '6px', fontSize: '14px' }} />
-                  </div>
-                  <div style={{ marginBottom: '20px' }}>
-                    <label style={{ display: 'block', marginBottom: '8px', color: '#2c3e50', fontWeight: '600' }}>Téléphone</label>
-                    <input type="tel" name="telephone" defaultValue={parametres.telephone} placeholder="+225 XX XX XX XX" style={{ width: '100%', padding: '12px', border: '2px solid #ddd', borderRadius: '6px', fontSize: '14px' }} />
-                  </div>
-                  <div style={{ marginBottom: '20px' }}>
-                    <label style={{ display: 'block', marginBottom: '8px', color: '#2c3e50', fontWeight: '600' }}>Email</label>
-                    <input type="email" name="email" defaultValue={parametres.email} placeholder="contact@etablissement.com" style={{ width: '100%', padding: '12px', border: '2px solid #ddd', borderRadius: '6px', fontSize: '14px' }} />
-                  </div>
-                  <div style={{ marginBottom: '20px' }}>
-                    <label style={{ display: 'block', marginBottom: '8px', color: '#2c3e50', fontWeight: '600' }}>Directeur Général</label>
-                    <input type="text" name="directeur" defaultValue={parametres.directeur} placeholder="Nom du directeur" style={{ width: '100%', padding: '12px', border: '2px solid #ddd', borderRadius: '6px', fontSize: '14px' }} />
-                  </div>
-                  <div style={{ marginBottom: '20px' }}>
-                    <label style={{ display: 'block', marginBottom: '8px', color: '#2c3e50', fontWeight: '600' }}>Censeur/Proviseur</label>
-                    <input type="text" name="censeur" defaultValue={parametres.censeur} placeholder="Nom du censeur" style={{ width: '100%', padding: '12px', border: '2px solid #ddd', borderRadius: '6px', fontSize: '14px' }} />
-                  </div>
-                  <div style={{ marginBottom: '20px' }}>
-                    <label style={{ display: 'block', marginBottom: '8px', color: '#2c3e50', fontWeight: '600' }}>Devise de l'établissement</label>
-                    <input type="text" name="devise" defaultValue={parametres.devise} placeholder="Ex: Excellence et Discipline" style={{ width: '100%', padding: '12px', border: '2px solid #ddd', borderRadius: '6px', fontSize: '14px' }} />
-                  </div>
+        function enregistrerNote(matricule) {
+            const n1 = parseFloat(document.getElementById(`n1_${matricule}`).value) || 0;
+            const n2 = parseFloat(document.getElementById(`n2_${matricule}`).value) || 0;
+            const ex = parseFloat(document.getElementById(`ex_${matricule}`).value) || 0;
+            const matiere = document.getElementById('matiereNoteSelect').value;
+            const periode = document.getElementById('periodeNote').value;
+
+            const notesDB = db.get('notes');
+            if(!notesDB[matricule]) notesDB[matricule] = {};
+            if(!notesDB[matricule][periode]) notesDB[matricule][periode] = {};
+            
+            notesDB[matricule][periode][matiere] = { n1, n2, ex, moyenne: (n1 + n2 + (ex * 2)) / 4 };
+            
+            db.set('notes', notesDB);
+            alert("Note enregistrée !");
+        }
+
+        // --- GÉNÉRATION DE BULLETIN ---
+        function genererBulletin() {
+            const matricule = document.getElementById('bulletinSearch').value;
+            const periode = document.getElementById('periodeBulletin').value;
+            const eleve = db.get('eleves').find(e => e.matricule === matricule);
+            const notes = db.get('notes')[matricule]?.[periode] || {};
+            const params = db.get('parametres');
+
+            if(!eleve) return alert("Élève non trouvé");
+
+            let html = `
+                <div class="bulletin-header">
+                    <h2>${params.nomEtablissement}</h2>
+                    <p>${params.devise}</p>
+                    <hr>
+                    <h3>BULLETIN DE NOTES - ${periode.toUpperCase()}</h3>
                 </div>
-                <button type="submit" style={{ padding: '12px 30px', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '14px', fontWeight: '600', background: '#3498db', color: 'white' }}>💾 Enregistrer les paramètres</button>
-              </form>
-            </div>
-          </div>
-        )}
+                <div class="bulletin-info">
+                    <div><strong>Nom:</strong> ${eleve.nom} ${eleve.prenom}</div>
+                    <div><strong>Classe:</strong> ${eleve.classe}</div>
+                    <div><strong>Année:</strong> ${params.anneeScolaire}</div>
+                    <div><strong>Matricule:</strong> ${eleve.matricule}</div>
+                </div>
+                <table class="notes-table">
+                    <thead>
+                        <tr><th>Matière</th><th>Note 1</th><th>Note 2</th><th>Examen</th><th>Moyenne</th></tr>
+                    </thead>
+                    <tbody>
+            `;
 
-        {/* Classes */}
-        {currentSection === 'classes' && (
-          <div>
-            <div style={{ background: 'white', padding: '20px 30px', borderRadius: '10px', marginBottom: '30px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h2 style={{ color: '#2c3e50', fontSize: '28px' }}>Gestion des classes</h2>
-              <button onClick={() => setActiveModal('classe')} style={{ padding: '12px 30px', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '14px', fontWeight: '600', background: '#27ae60', color: 'white' }}>➕ Ajouter une classe</button>
-            </div>
-            <div style={{ background: 'white', padding: '25px', borderRadius: '10px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }}>
-              <h3 style={{ color: '#2c3e50', marginBottom: '20px', paddingBottom: '10px', borderBottom: '2px solid #3498db' }}>Liste des classes</h3>
-              <div style={{ overflowX: 'auto' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '20px' }}>
-                  <thead>
+            let totalMoyennes = 0;
+            let countMatieres = 0;
+
+            for(let mat in notes) {
+                const n = notes[mat];
+                totalMoyennes += n.moyenne;
+                countMatieres++;
+                html += `
                     <tr>
-                      <th style={{ background: '#34495e', color: 'white', padding: '12px', textAlign: 'left' }}>Niveau</th>
-                      <th style={{ background: '#34495e', color: 'white', padding: '12px', textAlign: 'left' }}>Série</th>
-                      <th style={{ background: '#34495e', color: 'white', padding: '12px', textAlign: 'left' }}>Effectif max</th>
-                      <th style={{ background: '#34495e', color: 'white', padding: '12px', textAlign: 'left' }}>Effectif actuel</th>
-                      <th style={{ background: '#34495e', color: 'white', padding: '12px', textAlign: 'left' }}>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {classes.map(classe => (
-                      <tr key={classe.id} style={{ borderBottom: '1px solid #ddd' }}>
-                        <td style={{ padding: '12px' }}>{classe.niveau}</td>
-                        <td style={{ padding: '12px' }}>{classe.serie}</td>
-                        <td style={{ padding: '12px' }}>{classe.effectifMax}</td>
-                        <td style={{ padding: '12px' }}>{classe.effectifActuel}</td>
-                        <td style={{ padding: '12px' }}>
-                          <button onClick={() => deleteClasse(classe.id)} style={{ padding: '8px 16px', border: 'none', borderRadius: '6px', cursor: 'pointer', background: '#e74c3c', color: 'white', fontSize: '12px' }}>🗑️ Supprimer</button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        )}
+                        <td>${mat}</td>
+                        <td>${n.n1}</td>
+                        <td>${n.n2}</td>
+                        <td>${n.ex}</td>
+                        <td><strong>${n.moyenne.toFixed(2)}</strong></td>
+                    </tr>`;
+            }
 
-        {/* Matières */}
-        {currentSection === 'matieres' && (
-          <div>
-            <div style={{ background: 'white', padding: '20px 30px', borderRadius: '10px', marginBottom: '30px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h2 style={{ color: '#2c3e50', fontSize: '28px' }}>Gestion des matières</h2>
-              <button onClick={() => setActiveModal('matiere')} style={{
+            const moyGen = countMatieres > 0 ? (totalMoyennes / countMatieres).toFixed(2) : "0.00";
+            
+            html += `</tbody></table>
+                <div class="moyenne-display">MOYENNE GÉNÉRALE: ${moyGen} / 20</div>
+                <div class="appreciation">Observations: ${moyGen >= 10 ? 'Admis(e)' : 'Insuffisant'}</div>
+                <button class="btn btn-warning no-print" onclick="window.print()" style="margin-top:20px">Imprimer le Bulletin</button>
+            `;
+
+            document.getElementById('bulletinContainer').innerHTML = html;
+        }
+
+        // --- NAVIGATION ET MISE À JOUR ---
+        function showSection(id) {
+            document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            updateAllTables();
+        }
+
+        function updateStats() {
+            const eleves = db.get('eleves');
+            const classes = db.get('classes');
+            const enseignants = db.get('enseignants');
+            
+            if(document.getElementById('statEleves')) {
+                document.getElementById('statEleves').innerText = eleves.length;
+                document.getElementById('statClasses').innerText = classes.length;
+                document.getElementById('statProfs').innerText = enseignants.length;
+            }
+        }
+
+        function updateAllTables() {
+            // Mise à jour des listes déroulantes et tableaux (classes, matières, etc.)
+            const classes = db.get('classes');
+            const matieres = db.get('matieres');
+            
+            // Exemple pour les selects de classes
+            const classeSelects = ['classeEleve', 'classeNoteSelect'];
+            classeSelects.forEach(id => {
+                const el = document.getElementById(id);
+                if(el) el.innerHTML = classes.map(c => `<option value="${c.nom}">${c.nom}</option>`).join('');
+            });
+            
+            updateStats();
+        }
+
+        // Initialisation au chargement
+        window.onload = () => {
+            updateAllTables();
+            updateStats();
+        };
+    </script>
+</body>
+</html>
