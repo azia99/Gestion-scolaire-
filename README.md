@@ -1,517 +1,23 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SGS - Système de Gestion Scolaire</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 0;
-            margin: 0;
-            overflow: hidden;
-        }
-
-        .app-container {
-            width: 100%;
-            height: 100vh;
-            margin: 0;
-            background: white;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .header {
-            background: #2c3e50;
-            color: white;
-            padding: 15px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-shrink: 0;
-        }
-
-        .header h1 {
-            font-size: 20px;
-        }
-
-        .user-info {
-            font-size: 14px;
-        }
-
-        .content-wrapper {
-            display: flex;
-            flex: 1;
-            overflow: hidden;
-        }
-
-        .sidebar {
-            width: 70px;
-            background: #34495e;
-            padding: 10px 5px;
-            overflow-y: auto;
-            flex-shrink: 0;
-        }
-
-        .menu-btn {
-            width: 100%;
-            padding: 15px 5px;
-            margin: 5px 0;
-            background: #3498db;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 24px;
-            transition: all 0.3s;
-            text-align: center;
-            display: block;
-        }
-
-        .menu-btn:active {
-            transform: scale(0.95);
-        }
-
-        .menu-btn:hover {
-            background: #2980b9;
-        }
-
-        .menu-btn.active {
-            background: #27ae60;
-        }
-
-        .content {
-            flex: 1;
-            padding: 15px;
-            background: #ecf0f1;
-            overflow-y: auto;
-            overflow-x: hidden;
-        }
-
-        .page-title {
-            font-size: 20px;
-            color: #2c3e50;
-            margin-bottom: 20px;
-            font-weight: bold;
-            border-bottom: 3px solid #3498db;
-            padding-bottom: 10px;
-        }
-
-        .stats-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .stat-card {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-
-        .stat-card.success {
-            border-top: 5px solid #27ae60;
-        }
-
-        .stat-card.primary {
-            border-top: 5px solid #3498db;
-        }
-
-        .stat-card.warning {
-            border-top: 5px solid #f39c12;
-        }
-
-        .stat-card.danger {
-            border-top: 5px solid #e74c3c;
-        }
-
-        .stat-number {
-            font-size: 36px;
-            font-weight: bold;
-            color: #2c3e50;
-            margin-bottom: 5px;
-        }
-
-        .stat-label {
-            font-size: 14px;
-            color: #7f8c8d;
-            font-weight: 500;
-        }
-
-        .activity-box {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-
-        .activity-box h3 {
-            margin-bottom: 15px;
-            color: #2c3e50;
-            font-size: 18px;
-        }
-
-        .activity-item {
-            padding: 10px;
-            border-left: 4px solid #3498db;
-            margin-bottom: 10px;
-            background: #f8f9fa;
-            font-size: 13px;
-            border-radius: 4px;
-        }
-
-        .action-buttons {
-            margin-bottom: 20px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .btn {
-            padding: 10px 15px;
-            border: none;
-            border-radius: 6px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-size: 13px;
-            flex: 1;
-            min-width: 120px;
-        }
-
-        .btn:active {
-            transform: scale(0.95);
-        }
-
-        .btn-success {
-            background: #27ae60;
-            color: white;
-        }
-
-        .btn-primary {
-            background: #3498db;
-            color: white;
-        }
-
-        .btn-warning {
-            background: #f39c12;
-            color: white;
-        }
-
-        .data-table {
-            width: 100%;
-            background: white;
-            border-radius: 10px;
-            overflow-x: auto;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-
-        .data-table table {
-            width: 100%;
-            border-collapse: collapse;
-            min-width: 600px;
-        }
-
-        .data-table th {
-            background: #34495e;
-            color: white;
-            padding: 12px 8px;
-            text-align: left;
-            font-weight: 600;
-            font-size: 13px;
-        }
-
-        .data-table td {
-            padding: 10px 8px;
-            border-bottom: 1px solid #ecf0f1;
-            font-size: 13px;
-        }
-
-        .data-table tr:hover {
-            background: #f8f9fa;
-        }
-
-        .search-box {
-            margin-bottom: 15px;
-        }
-
-        .search-box input {
-            width: 100%;
-            padding: 12px 16px;
-            border: 2px solid #ddd;
-            border-radius: 6px;
-            font-size: 14px;
-        }
-
-        .search-box input:focus {
-            outline: none;
-            border-color: #3498db;
-        }
-
-        .info-section {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-        }
-
-        .info-section h2 {
-            color: #2c3e50;
-            margin-bottom: 15px;
-            font-size: 20px;
-        }
-
-        .features-list {
-            list-style: none;
-            padding: 0;
-        }
-
-        .features-list li {
-            padding: 12px 15px;
-            margin: 8px 0;
-            background: #f8f9fa;
-            border-left: 5px solid #3498db;
-            border-radius: 4px;
-            font-size: 14px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: #2c3e50;
-            font-weight: 600;
-            font-size: 14px;
-        }
-
-        .form-group select,
-        .form-group input {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #ddd;
-            border-radius: 6px;
-            font-size: 14px;
-        }
-
-        .stat-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 12px;
-            background: #f8f9fa;
-            margin: 10px 0;
-            border-left: 5px solid #3498db;
-            border-radius: 4px;
-            font-size: 14px;
-        }
-
-        .stat-row strong {
-            color: #2c3e50;
-        }
-
-        @media (max-width: 768px) {
-            .header h1 {
-                font-size: 18px;
-            }
-            
-            .user-info {
-                font-size: 12px;
-            }
-            
-            .sidebar {
-                width: 60px;
-                padding: 5px 3px;
-            }
-            
-            .menu-btn {
-                font-size: 20px;
-                padding: 12px 5px;
-            }
-            
-            .content {
-                padding: 10px;
-            }
-            
-            .page-title {
-                font-size: 18px;
-            }
-            
-            .stat-number {
-                font-size: 28px;
-            }
-            
-            .stats-container {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="app-container">
-        <div class="header">
-            <h1>🏫 SGS</h1>
-            <div class="user-info">Admin</div>
-        </div>
-        
-        <div class="content-wrapper">
-            <div class="sidebar">
-                <button class="menu-btn active" onclick="showPage('dashboard')" title="Tableau de Bord">📊</button>
-                <button class="menu-btn" onclick="showPage('classes')" title="Classes">🎓</button>
-                <button class="menu-btn" onclick="showPage('eleves')" title="Élèves">👨‍🎓</button>
-                <button class="menu-btn" onclick="showPage('enseignants')" title="Enseignants">👨‍🏫</button>
-                <button class="menu-btn" onclick="showPage('matieres')" title="Matières">📚</button>
-                <button class="menu-btn" onclick="showPage('notes')" title="Notes">📝</button>
-                <button class="menu-btn" onclick="showPage('bulletins')" title="Bulletins">📋</button>
-                <button class="menu-btn" onclick="showPage('statistiques')" title="Statistiques">📈</button>
-                <button class="menu-btn" onclick="showPage('about')" title="À propos">ℹ️</button>
-            </div>
-            
-            <div class="content" id="content">
-                <!-- Le contenu sera chargé ici -->
-            </div>
-        </div>
-    </div>
-
-    <script>
-        const data = {
-            classes: [
-                {id: 1, nom: '6ème A', niveau: 'Collège', effectif_max: 45, effectif: 42},
-                {id: 2, nom: '6ème B', niveau: 'Collège', effectif_max: 45, effectif: 40},
-                {id: 3, nom: '5ème A', niveau: 'Collège', effectif_max: 45, effectif: 38},
-                {id: 4, nom: '4ème A', niveau: 'Collège', effectif_max: 45, effectif: 35},
-                {id: 5, nom: '3ème A', niveau: 'Collège', effectif_max: 45, effectif: 33},
-                {id: 6, nom: '2nde A', niveau: 'Lycée', effectif_max: 50, effectif: 45},
-                {id: 7, nom: '1ère C', niveau: 'Lycée', effectif_max: 45, effectif: 38},
-                {id: 8, nom: 'Terminale C', niveau: 'Lycée', effectif_max: 45, effectif: 36}
-            ],
-            eleves: [
-                {id: 1, matricule: 'E001', nom: 'KOUASSI', prenoms: 'Jean-Pierre', sexe: 'M', classe: '6ème A', telephone: '+225 01 02 03 04 05'},
-                {id: 2, matricule: 'E002', nom: 'DIALLO', prenoms: 'Fatou', sexe: 'F', classe: '6ème A', telephone: '+225 01 02 03 04 06'},
-                {id: 3, matricule: 'E003', nom: 'TRAORE', prenoms: 'Mamadou', sexe: 'M', classe: '5ème A', telephone: '+225 01 02 03 04 07'},
-                {id: 4, matricule: 'E004', nom: 'KONE', prenoms: 'Awa', sexe: 'F', classe: '4ème A', telephone: '+225 01 02 03 04 08'},
-                {id: 5, matricule: 'E005', nom: 'N\'GUESSAN', prenoms: 'Konan', sexe: 'M', classe: '3ème A', telephone: '+225 01 02 03 04 09'}
-            ],
-            enseignants: [
-                {id: 1, nom: 'AMANI', prenoms: 'Kouadio', specialite: 'Mathématiques', telephone: '+225 07 08 09 10 11', email: 'amani@sgs.edu'},
-                {id: 2, nom: 'BAMBA', prenoms: 'Marie', specialite: 'Français', telephone: '+225 07 08 09 10 12', email: 'bamba@sgs.edu'},
-                {id: 3, nom: 'COULIBALY', prenoms: 'Ibrahim', specialite: 'Anglais', telephone: '+225 07 08 09 10 13', email: 'coulibaly@sgs.edu'}
-            ],
-            matieres: [
-                {id: 1, nom: 'Mathématiques', coefficient: 4, description: 'Sciences exactes'},
-                {id: 2, nom: 'Français', coefficient: 4, description: 'Langues'},
-                {id: 3, nom: 'Anglais', coefficient: 3, description: 'Langues'},
-                {id: 4, nom: 'Sciences Physiques', coefficient: 3, description: 'Sciences'},
-                {id: 5, nom: 'SVT', coefficient: 2, description: 'Sciences de la Vie'},
-                {id: 6, nom: 'Histoire-Géographie', coefficient: 3, description: 'Sciences humaines'},
-                {id: 7, nom: 'EPS', coefficient: 1, description: 'Sport'}
-            ],
-            notes: [
-                {id: 1, eleve: 'KOUASSI Jean-Pierre', matiere: 'Mathématiques', note: 15.5, sur: 20, type: 'Devoir', periode: 'Trimestre 1', date: '15/01/2026'},
-                {id: 2, eleve: 'DIALLO Fatou', matiere: 'Français', note: 14.0, sur: 20, type: 'Composition', periode: 'Trimestre 1', date: '14/01/2026'},
-                {id: 3, eleve: 'TRAORE Mamadou', matiere: 'Anglais', note: 16.5, sur: 20, type: 'Contrôle', periode: 'Trimestre 1', date: '13/01/2026'}
-            ]
-        };
-
-        function showPage(page) {
-            document.querySelectorAll('.menu-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-            
-            const content = document.getElementById('content');
-            content.scrollTop = 0;
-
-            switch(page) {
-                case 'dashboard': showDashboard(); break;
-                case 'classes': showClasses(); break;
-                case 'eleves': showEleves(); break;
-                case 'enseignants': showEnseignants(); break;
-                case 'matieres': showMatieres(); break;
-                case 'notes': showNotes(); break;
-                case 'bulletins': showBulletins(); break;
-                case 'statistiques': showStatistiques(); break;
-                case 'about': showAbout(); break;
-            }
-        }
-
-        function showDashboard() {
-            const content = document.getElementById('content');
-            content.innerHTML = `
-                <h2 class="page-title">TABLEAU DE BORD</h2>
-                
-                <div class="stats-container">
-                    <div class="stat-card success">
-                        <div class="stat-number">${data.classes.length}</div>
-                        <div class="stat-label">Classes</div>
-                    </div>
-                    <div class="stat-card primary">
-                        <div class="stat-number">${data.eleves.length}</div>
-                        <div class="stat-label">Élèves</div>
-                    </div>
-                    <div class="stat-card warning">
-                        <div class="stat-number">${data.enseignants.length}</div>
-                        <div class="stat-label">Enseignants</div>
-                    </div>
-                    <div class="stat-card danger">
-                        <div class="stat-number">${data.notes.length}</div>
-                        <div class="stat-label">Notes</div>
-                    </div>
-                </div>
-
-                <div class="activity-box">
-                    <h3>📋 Activités Récentes</h3>
-                    <div class="activity-item">• ${new Date().toLocaleDateString('fr-FR')} ${new Date().toLocaleTimeString('fr-FR')} - Application démarrée</div>
-                    <div class="activity-item">• Base de données: ${data.classes.length} classes actives</div>
-                    <div class="activity-item">• Total élèves inscrits: ${data.eleves.length}</div>
-                    <div class="activity-item">• Total notes enregistrées: ${data.notes.length}</div>
-                    <div class="activity-item">• Système opérationnel - Aucune erreur détectée</div>
-                </div>
-            `;
-        }
-
-        function showClasses() {
-            const content = document.getElementById('content');
-            let rows = data.classes.map(c => `
+ap(c => `
                 <tr>
                     <td>${c.id}</td>
-                    <td><strong>${c.nom}</strong></td>
-                    <td>${c.niveau}</td>
-                    <td>${c.effectif_max}</td>
-                    <td><strong style="color: #27ae60">${c.effectif}</strong></td>
+                    <td><strong>${c.matricule}</strong></td>
+                    <td>${c.nom} ${c.prenoms}</td>
+                    <td>${c.sexe}</td>
+                    <td>${c.classe}</td>
+                    <td>${c.tel}</td>
                 </tr>
             `).join('');
 
-            content.innerHTML = `
-                <h2 class="page-title">GESTION DES CLASSES</h2>
-                
+            document.getElementById('content').innerHTML = `
+                <h2 class="page-title">👨‍🎓 GESTION DES ÉLÈVES</h2>
                 <div class="action-buttons">
-                    <button class="btn btn-success" onclick="alert('➕ Ajouter une nouvelle classe')">➕ Nouvelle</button>
-                    <button class="btn btn-primary" onclick="showClasses()">🔄 Actualiser</button>
+                    <button class="btn btn-success" onclick="openAddEleve()">➕ Nouvel Élève</button>
                 </div>
-
                 <div class="data-table">
                     <table>
                         <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Nom</th>
-                                <th>Niveau</th>
-                                <th>Max</th>
-                                <th>Actuel</th>
-                            </tr>
+                            <tr><th>ID</th><th>Matricule</th><th>Nom</th><th>Sexe</th><th>Classe</th><th>Téléphone</th></tr>
                         </thead>
                         <tbody>${rows}</tbody>
                     </table>
@@ -519,97 +25,87 @@
             `;
         }
 
-        function showEleves() {
-            const content = document.getElementById('content');
-            
-            function renderTable(eleves) {
-                return eleves.map(e => `
-                    <tr>
-                        <td>${e.matricule}</td>
-                        <td><strong>${e.nom}</strong></td>
-                        <td>${e.prenoms}</td>
-                        <td>${e.sexe}</td>
-                        <td>${e.classe}</td>
-                    </tr>
-                `).join('');
-            }
-
-            content.innerHTML = `
-                <h2 class="page-title">GESTION DES ÉLÈVES</h2>
-                
-                <div class="action-buttons">
-                    <button class="btn btn-success" onclick="alert('➕ Nouvel élève')">➕ Nouveau</button>
-                    <button class="btn btn-warning" onclick="alert('📥 Export CSV')">📥 Export</button>
+        function openAddEleve() {
+            showModal(`
+                <div class="modal-header">
+                    <h2>➕ Nouvel Élève</h2>
+                    <button class="close-btn" onclick="closeModal()">×</button>
                 </div>
-
-                <div class="search-box">
-                    <input type="text" placeholder="🔍 Rechercher un élève..." oninput="filterEleves(this.value)">
-                </div>
-
-                <div class="data-table">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Matricule</th>
-                                <th>Nom</th>
-                                <th>Prénoms</th>
-                                <th>Sexe</th>
-                                <th>Classe</th>
-                            </tr>
-                        </thead>
-                        <tbody id="elevesTableBody">${renderTable(data.eleves)}</tbody>
-                    </table>
-                </div>
-            `;
+                <form onsubmit="saveEleve(event)">
+                    <div class="form-group">
+                        <label>Matricule :</label>
+                        <input type="text" id="matricule" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Nom :</label>
+                        <input type="text" id="nomE" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Prénoms :</label>
+                        <input type="text" id="prenoms" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Sexe :</label>
+                        <select id="sexe" required>
+                            <option value="">Sélectionner</option>
+                            <option value="M">Masculin</option>
+                            <option value="F">Féminin</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Classe :</label>
+                        <input type="text" id="classe" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Téléphone :</label>
+                        <input type="text" id="tel" required>
+                    </div>
+                    <div class="action-buttons">
+                        <button type="submit" class="btn btn-success">✅ Enregistrer</button>
+                        <button type="button" class="btn btn-danger" onclick="closeModal()">❌ Annuler</button>
+                    </div>
+                </form>
+            `);
         }
 
-        function filterEleves(term) {
-            const filtered = data.eleves.filter(e => 
-                e.nom.toLowerCase().includes(term.toLowerCase()) ||
-                e.prenoms.toLowerCase().includes(term.toLowerCase()) ||
-                e.matricule.toLowerCase().includes(term.toLowerCase())
-            );
-
-            const tbody = document.getElementById('elevesTableBody');
-            tbody.innerHTML = filtered.map(e => `
-                <tr>
-                    <td>${e.matricule}</td>
-                    <td><strong>${e.nom}</strong></td>
-                    <td>${e.prenoms}</td>
-                    <td>${e.sexe}</td>
-                    <td>${e.classe}</td>
-                </tr>
-            `).join('') || '<tr><td colspan="5" style="text-align:center; padding:20px; color:#999">Aucun élève trouvé</td></tr>';
+        function saveEleve(e) {
+            e.preventDefault();
+            const newId = Math.max(...APP_DATA.eleves.map(e => e.id), 0) + 1;
+            APP_DATA.eleves.push({
+                id: newId,
+                matricule: document.getElementById('matricule').value,
+                nom: document.getElementById('nomE').value,
+                prenoms: document.getElementById('prenoms').value,
+                sexe: document.getElementById('sexe').value,
+                classe: document.getElementById('classe').value,
+                tel: document.getElementById('tel').value
+            });
+            closeModal();
+            renderEleves();
+            alert('✅ Élève ajouté avec succès !');
         }
 
-        function showEnseignants() {
-            const content = document.getElementById('content');
-            let rows = data.enseignants.map(e => `
+        // Gestion des enseignants
+        function renderEnseignants() {
+            const rows = APP_DATA.enseignants.map(e => `
                 <tr>
-                    <td><strong>${e.nom}</strong></td>
-                    <td>${e.prenoms}</td>
+                    <td>${e.id}</td>
+                    <td>${e.nom} ${e.prenoms}</td>
                     <td>${e.specialite}</td>
+                    <td>${e.tel}</td>
                     <td>${e.email}</td>
                 </tr>
             `).join('');
 
-            content.innerHTML = `
-                <h2 class="page-title">GESTION DES ENSEIGNANTS</h2>
-                
+            document.getElementById('content').innerHTML = `
+                <h2 class="page-title">👨‍🏫 GESTION DES ENSEIGNANTS</h2>
                 <div class="action-buttons">
-                    <button class="btn btn-success" onclick="alert('➕ Nouvel enseignant')">➕ Nouveau</button>
-                    <button class="btn btn-primary" onclick="showEnseignants()">🔄 Actualiser</button>
+                    <button class="btn btn-success" onclick="openAddEnseignant()">➕ Nouvel Enseignant</button>
                 </div>
-
                 <div class="data-table">
                     <table>
                         <thead>
-                            <tr>
-                                <th>Nom</th>
-                                <th>Prénoms</th>
-                                <th>Spécialité</th>
-                                <th>Email</th>
-                            </tr>
+                            <tr><th>ID</th><th>Nom complet</th><th>Spécialité</th><th>Téléphone</th><th>Email</th></tr>
                         </thead>
                         <tbody>${rows}</tbody>
                     </table>
@@ -617,34 +113,77 @@
             `;
         }
 
-        function showMatieres() {
-            const content = document.getElementById('content');
-            let rows = data.matieres.map(m => `
+        function openAddEnseignant() {
+            showModal(`
+                <div class="modal-header">
+                    <h2>➕ Nouvel Enseignant</h2>
+                    <button class="close-btn" onclick="closeModal()">×</button>
+                </div>
+                <form onsubmit="saveEnseignant(event)">
+                    <div class="form-group">
+                        <label>Nom :</label>
+                        <input type="text" id="nomEns" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Prénoms :</label>
+                        <input type="text" id="prenomsEns" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Spécialité :</label>
+                        <input type="text" id="specialite" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Téléphone :</label>
+                        <input type="text" id="telEns" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email :</label>
+                        <input type="email" id="emailEns" required>
+                    </div>
+                    <div class="action-buttons">
+                        <button type="submit" class="btn btn-success">✅ Enregistrer</button>
+                        <button type="button" class="btn btn-danger" onclick="closeModal()">❌ Annuler</button>
+                    </div>
+                </form>
+            `);
+        }
+
+        function saveEnseignant(e) {
+            e.preventDefault();
+            const newId = Math.max(...APP_DATA.enseignants.map(e => e.id), 0) + 1;
+            APP_DATA.enseignants.push({
+                id: newId,
+                nom: document.getElementById('nomEns').value,
+                prenoms: document.getElementById('prenomsEns').value,
+                specialite: document.getElementById('specialite').value,
+                tel: document.getElementById('telEns').value,
+                email: document.getElementById('emailEns').value
+            });
+            closeModal();
+            renderEnseignants();
+            alert('✅ Enseignant ajouté avec succès !');
+        }
+
+        // Gestion des matières
+        function renderMatieres() {
+            const rows = APP_DATA.matieres.map(m => `
                 <tr>
                     <td>${m.id}</td>
-                    <td><strong>${m.nom}</strong></td>
-                    <td>${m.coefficient}</td>
-                    <td>${m.description}</td>
+                    <td>${m.nom}</td>
+                    <td>${m.coef}</td>
+                    <td>${m.desc}</td>
                 </tr>
             `).join('');
 
-            content.innerHTML = `
-                <h2 class="page-title">GESTION DES MATIÈRES</h2>
-                
+            document.getElementById('content').innerHTML = `
+                <h2 class="page-title">📚 GESTION DES MATIÈRES</h2>
                 <div class="action-buttons">
-                    <button class="btn btn-success" onclick="alert('➕ Nouvelle matière')">➕ Nouveau</button>
-                    <button class="btn btn-primary" onclick="showMatieres()">🔄 Actualiser</button>
+                    <button class="btn btn-success" onclick="openAddMatiere()">➕ Nouvelle Matière</button>
                 </div>
-
                 <div class="data-table">
                     <table>
                         <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Matière</th>
-                                <th>Coef.</th>
-                                <th>Description</th>
-                            </tr>
+                            <tr><th>ID</th><th>Nom</th><th>Coefficient</th><th>Description</th></tr>
                         </thead>
                         <tbody>${rows}</tbody>
                     </table>
@@ -652,36 +191,69 @@
             `;
         }
 
-        function showNotes() {
-            const content = document.getElementById('content');
-            let rows = data.notes.map(n => `
+        function openAddMatiere() {
+            showModal(`
+                <div class="modal-header">
+                    <h2>➕ Nouvelle Matière</h2>
+                    <button class="close-btn" onclick="closeModal()">×</button>
+                </div>
+                <form onsubmit="saveMatiere(event)">
+                    <div class="form-group">
+                        <label>Nom de la matière :</label>
+                        <input type="text" id="nomMatiere" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Coefficient :</label>
+                        <input type="number" id="coef" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Description :</label>
+                        <input type="text" id="desc" required>
+                    </div>
+                    <div class="action-buttons">
+                        <button type="submit" class="btn btn-success">✅ Enregistrer</button>
+                        <button type="button" class="btn btn-danger" onclick="closeModal()">❌ Annuler</button>
+                    </div>
+                </form>
+            `);
+        }
+
+        function saveMatiere(e) {
+            e.preventDefault();
+            const newId = Math.max(...APP_DATA.matieres.map(m => m.id), 0) + 1;
+            APP_DATA.matieres.push({
+                id: newId,
+                nom: document.getElementById('nomMatiere').value,
+                coef: parseInt(document.getElementById('coef').value),
+                desc: document.getElementById('desc').value
+            });
+            closeModal();
+            renderMatieres();
+            alert('✅ Matière ajoutée avec succès !');
+        }
+
+        // Gestion des notes
+        function renderNotes() {
+            const rows = APP_DATA.notes.map(n => `
                 <tr>
+                    <td>${n.id}</td>
                     <td>${n.eleve}</td>
                     <td>${n.matiere}</td>
-                    <td><strong style="color: #27ae60">${n.note}/${n.sur}</strong></td>
+                    <td>${n.note}</td>
                     <td>${n.type}</td>
                     <td>${n.date}</td>
                 </tr>
             `).join('');
 
-            content.innerHTML = `
-                <h2 class="page-title">GESTION DES NOTES</h2>
-                
+            document.getElementById('content').innerHTML = `
+                <h2 class="page-title">📝 GESTION DES NOTES</h2>
                 <div class="action-buttons">
-                    <button class="btn btn-success" onclick="alert('➕ Nouvelle note')">➕ Nouveau</button>
-                    <button class="btn btn-warning" onclick="alert('📊 Statistiques')">📊 Stats</button>
+                    <button class="btn btn-success" onclick="openAddNote()">➕ Nouvelle Note</button>
                 </div>
-
                 <div class="data-table">
                     <table>
                         <thead>
-                            <tr>
-                                <th>Élève</th>
-                                <th>Matière</th>
-                                <th>Note</th>
-                                <th>Type</th>
-                                <th>Date</th>
-                            </tr>
+                            <tr><th>ID</th><th>Élève</th><th>Matière</th><th>Note</th><th>Type</th><th>Date</th></tr>
                         </thead>
                         <tbody>${rows}</tbody>
                     </table>
@@ -689,163 +261,135 @@
             `;
         }
 
-        function showBulletins() {
-            const content = document.getElementById('content');
-            content.innerHTML = `
-                <h2 class="page-title">GESTION DES BULLETINS</h2>
-                
-                <div class="info-section">
-                    <h2>📋 Génération de Bulletins</h2>
-                    
+        function openAddNote() {
+            showModal(`
+                <div class="modal-header">
+                    <h2>➕ Nouvelle Note</h2>
+                    <button class="close-btn" onclick="closeModal()">×</button>
+                </div>
+                <form onsubmit="saveNote(event)">
                     <div class="form-group">
-                        <label>Sélectionner une classe :</label>
-                        <select>
-                            <option>-- Choisir une classe --</option>
-                            ${data.classes.map(c => `<option>${c.nom}</option>`).join('')}
-                        </select>
+                        <label>Élève :</label>
+                        <input type="text" id="eleveNote" placeholder="Nom complet" required>
                     </div>
-                    
                     <div class="form-group">
-                        <label>Période :</label>
-                        <select>
-                            <option>Trimestre 1</option>
-                            <option>Trimestre 2</option>
-                            <option>Trimestre 3</option>
-                        </select>
+                        <label>Matière :</label>
+                        <input type="text" id="matiereNote" placeholder="Nom de la matière" required>
                     </div>
-                    
+                    <div class="form-group">
+                        <label>Note :</label>
+                        <input type="number" id="note" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Type :</label>
+                        <input type="text" id="type" placeholder="Devoir, Examen, etc." required>
+                    </div>
+                    <div class="form-group">
+                        <label>Date :</label>
+                        <input type="date" id="dateNote" required>
+                    </div>
                     <div class="action-buttons">
-                        <button class="btn btn-success" onclick="alert('✅ Bulletin généré!')">📄 Générer Bulletin</button>
-                        <button class="btn btn-primary" onclick="alert('📥 Export PDF')">📥 Export PDF</button>
+                        <button type="submit" class="btn btn-success">✅ Enregistrer</button>
+                        <button type="button" class="btn btn-danger" onclick="closeModal()">❌ Annuler</button>
                     </div>
-                </div>
+                </form>
+            `);
+        }
 
-                <div class="activity-box">
-                    <h3>📊 Aperçu des Résultats</h3>
-                    <div class="stat-row">
-                        <span>Moyenne Générale</span>
-                        <strong>12.5 / 20</strong>
-                    </div>
-                    <div class="stat-row">
-                        <span>1er de Classe</span>
-                        <strong>DIALLO Fatou (16.5/20)</strong>
-                    </div>
-                    <div class="stat-row">
-                        <span>Taux de Réussite</span>
-                        <strong>85%</strong>
-                    </div>
-                </div>
+        function saveNote(e) {
+            e.preventDefault();
+            const newId = Math.max(...APP_DATA.notes.map(n => n.id), 0) + 1;
+            APP_DATA.notes.push({
+                id: newId,
+                eleve: document.getElementById('eleveNote').value,
+                matiere: document.getElementById('matiereNote').value,
+                note: parseFloat(document.getElementById('note').value),
+                type: document.getElementById('type').value,
+                date: document.getElementById('dateNote').value
+            });
+            closeModal();
+            renderNotes();
+            alert('✅ Note ajoutée avec succès !');
+        }
+
+        // Gestion des bulletins
+        function renderBulletins() {
+            document.getElementById('content').innerHTML = `
+                <h2 class="page-title">📋 GESTION DES BULLETINS</h2>
+                <p>Fonctionnalité à venir...</p>
             `;
         }
 
-        function showStatistiques() {
-            const content = document.getElementById('content');
-            content.innerHTML = `
-                <h2 class="page-title">STATISTIQUES</h2>
-                
-                <div class="stats-container">
-                    <div class="stat-card success">
-                        <div class="stat-number">267</div>
-                        <div class="stat-label">Total Élèves</div>
-                    </div>
-                    <div class="stat-card primary">
-                        <div class="stat-number">12.8</div>
-                        <div class="stat-label">Moyenne Générale</div>
-                    </div>
-                    <div class="stat-card warning">
-                        <div class="stat-number">92%</div>
-                        <div class="stat-label">Taux de Réussite</div>
-                    </div>
-                    <div class="stat-card danger">
-                        <div class="stat-number">8</div>
-                        <div class="stat-label">Classes Actives</div>
-                    </div>
-                </div>
+        // Statistiques
+        function renderStatistiques() {
+            document.getElementById('content').innerHTML = `
+                <h2 class="page-title">📈 STATISTIQUES</h2>
+                <p>Fonctionnalité à venir...</p>
+            `;
+        }
 
+        // Paramètres
+        function renderParametres() {
+            document.getElementById('content').innerHTML = `
+                <h2 class="page-title">⚙️ PARAMÈTRES</h2>
                 <div class="info-section">
-                    <h2>📊 Statistiques par Niveau</h2>
-                    <div class="stat-row">
-                        <span>Collège</span>
-                        <strong>188 élèves - Moyenne: 12.5/20</strong>
-                    </div>
-                    <div class="stat-row">
-                        <span>Lycée</span>
-                        <strong>119 élèves - Moyenne: 13.2/20</strong>
-                    </div>
-                </div>
-
-                <div class="info-section">
-                    <h2>🏆 Meilleures Moyennes par Classe</h2>
-                    ${data.classes.map(c => `
-                        <div class="stat-row">
-                            <span>${c.nom}</span>
-                            <strong>${(Math.random() * 5 + 12).toFixed(2)}/20</strong>
+                    <h3>Paramètres de l'établissement</h3>
+                    <form onsubmit="saveParameters(event)">
+                        <div class="form-group">
+                            <label>Nom de l'établissement :</label>
+                            <input type="text" id="etablissement" value="${APP_DATA.settings.etablissement}" required>
                         </div>
-                    `).join('')}
+                        <div class="form-group">
+                            <label>Année académique :</label>
+                            <input type="text" id="annee" value="${APP_DATA.settings.annee}" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Trimestre :</label>
+                            <select id="trimestre" required>
+                                <option value="Trimestre 1" ${APP_DATA.settings.trimestre === 'Trimestre 1' ? 'selected' : ''}>Trimestre 1</option>
+                                <option value="Trimestre 2" ${APP_DATA.settings.trimestre === 'Trimestre 2' ? 'selected' : ''}>Trimestre 2</option>
+                                <option value="Trimestre 3" ${APP_DATA.settings.trimestre === 'Trimestre 3' ? 'selected' : ''}>Trimestre 3</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Modifier Identifiant :</label>
+                            <input type="text" id="newUsername" value="${APP_DATA.auth.username}" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Modifier Mot de passe :</label>
+                            <input type="password" id="newPassword" required>
+                        </div>
+                        <div class="action-buttons">
+                            <button type="submit" class="btn btn-success">✅ Enregistrer Modifications</button>
+                        </div>
+                    </form>
                 </div>
             `;
         }
 
-        function showAbout() {
-            const content = document.getElementById('content');
-            content.innerHTML = `
-                <h2 class="page-title">À PROPOS DU SGS</h2>
-                
-                <div class="info-section">
-                    <h2>🏫 Système de Gestion Scolaire</h2>
-                    <p style="font-size: 14px; line-height: 1.6; color: #555;">
-                        Le SGS est une application complète de gestion scolaire conçue pour faciliter 
-                        l'administration des établissements scolaires. Elle permet de gérer efficacement 
-                        les classes, les élèves, les enseignants, les matières et les notes.
-                    </p>
-                </div>
+        function saveParameters(e) {
+            e.preventDefault();
+            APP_DATA.settings.etablissement = document.getElementById('etablissement').value;
+            APP_DATA.settings.annee = document.getElementById('annee').value;
+            APP_DATA.settings.trimestre = document.getElementById('trimestre').value;
+            APP_DATA.auth.username = document.getElementById('newUsername').value;
+            APP_DATA.auth.password = document.getElementById('newPassword').value;
 
-                <div class="info-section">
-                    <h2>✨ Fonctionnalités Principales</h2>
-                    <ul class="features-list">
-                        <li>📊 Tableau de bord avec statistiques en temps réel</li>
-                        <li>🎓 Gestion complète des classes et effectifs</li>
-                        <li>👨‍🎓 Base de données des élèves avec recherche</li>
-                        <li>👨‍🏫 Gestion du personnel enseignant</li>
-                        <li>📚 Configuration des matières et coefficients</li>
-                        <li>📝 Saisie et consultation des notes</li>
-                        <li>📋 Génération automatique de bulletins</li>
-                        <li>📈 Analyses statistiques détaillées</li>
-                        <li>📥 Export des données en CSV/PDF</li>
-                        <li>📱 Interface responsive pour mobile et tablette</li>
-                    </ul>
-                </div>
-
-                <div class="info-section">
-                    <h2>ℹ️ Informations Système</h2>
-                    <div class="stat-row">
-                        <span>Version</span>
-                        <strong>1.0.0</strong>
-                    </div>
-                    <div class="stat-row">
-                        <span>Date de mise à jour</span>
-                        <strong>${new Date().toLocaleDateString('fr-FR')}</strong>
-                    </div>
-                    <div class="stat-row">
-                        <span>Statut</span>
-                        <strong style="color: #27ae60">✅ Opérationnel</strong>
-                    </div>
-                </div>
-
-                <div class="activity-box">
-                    <h3>📞 Support & Contact</h3>
-                    <div class="activity-item">📧 Email: support@sgs.edu</div>
-                    <div class="activity-item">📱 Téléphone: +225 01 02 03 04 05</div>
-                    <div class="activity-item">🌐 Site web: www.sgs.edu</div>
-                    <div class="activity-item">📍 Adresse: Abidjan, Côte d'Ivoire</div>
-                </div>
-            `;
+            updateHeader();
+            closeModal(); // Close modal if open
+            renderParametres(); // Re-render the parameters to show updated info
+            alert('✅ Paramètres mis à jour avec succès !');
         }
 
-        // Initialiser l'application avec le dashboard
-        window.addEventListener('DOMContentLoaded', function() {
-            showDashboard();
-        });
+        // Modal functions
+        function showModal(content) {
+            document.getElementById('modalContent').innerHTML = content;
+            document.getElementById('modal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+        }
     </script>
 </body>
 </html>
