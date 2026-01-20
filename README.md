@@ -2,450 +2,595 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SGE - Système de Gestion Établissement</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SGS - Système de Gestion Scolaire</title>
     <style>
-        :root {
-            --primary: #2c3e50;
-            --secondary: #34495e;
-            --accent: #3498db;
-            --success: #27ae60;
-            --danger: #e74c3c;
-            --light: #ecf0f1;
-            --dark: #2c3e50;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background-color: var(--light); display: flex; height: 100vh; overflow: hidden; }
-
-        /* Sidebar */
-        .sidebar { width: 260px; background: var(--primary); color: white; display: flex; flex-direction: column; transition: 0.3s; }
-        .logo-area { padding: 20px; text-align: center; background: rgba(0,0,0,0.1); border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .nav-menu { flex: 1; padding: 10px; }
-        .nav-item { 
-            padding: 12px 15px; margin: 5px 0; border-radius: 8px; cursor: pointer; 
-            display: flex; align-items: center; gap: 10px; transition: 0.2s;
-        }
-        .nav-item:hover { background: var(--accent); }
-        .nav-item.active { background: var(--accent); font-weight: bold; }
-
-        /* Main Content */
-        .main-content { flex: 1; display: flex; flex-direction: column; overflow-y: auto; }
-        header { 
-            background: white; padding: 15px 30px; display: flex; justify-content: space-between; 
-            align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 0;
+            margin: 0;
+            overflow: hidden;
         }
 
-        .container { padding: 25px; max-width: 1200px; margin: 0 auto; width: 100%; }
-        .section { display: none; animation: fadeIn 0.3s; }
-        .section.active { display: block; }
-
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        /* Cards & UI Elements */
-        .card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
-        .stat-card { background: white; padding: 20px; border-radius: 10px; border-left: 5px solid var(--accent); }
-        
-        /* Forms */
-        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 15px; }
-        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; margin-top: 5px; }
-        button { 
-            padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; 
-            font-weight: 600; transition: 0.3s; 
-        }
-        .btn-add { background: var(--success); color: white; }
-        .btn-print { background: var(--primary); color: white; }
-        .btn-danger { background: var(--danger); color: white; padding: 5px 10px; font-size: 12px; }
-
-        /* Tables */
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; background: white; }
-        table th { background: var(--secondary); color: white; padding: 12px; text-align: left; }
-        table td { padding: 12px; border-bottom: 1px solid #eee; }
-
-        /* Bulletin Design */
-        #bulletin-print-zone { display: none; }
-        @media print {
-            body * { visibility: hidden; }
-            #bulletin-print-zone, #bulletin-print-zone * { visibility: visible; }
-            #bulletin-print-zone { position: absolute; left: 0; top: 0; width: 100%; display: block !important; padding: 40px; }
-            .no-print { display: none !important; }
+        .app-container {
+            width: 100%;
+            height: 100vh;
+            margin: 0;
+            background: white;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
 
-        .bulletin-header { display: flex; justify-content: space-between; border-bottom: 2px solid #000; padding-bottom: 10px; }
-        .moyenne-generale { font-size: 1.5em; font-weight: bold; text-align: right; margin-top: 20px; }
+        .header {
+            background: #2c3e50;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .header h1 {
+            font-size: 20px;
+        }
+
+        .user-info {
+            font-size: 14px;
+        }
+
+        .content-wrapper {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: 70px;
+            background: #34495e;
+            padding: 10px 5px;
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+
+        .menu-btn {
+            width: 100%;
+            padding: 15px 5px;
+            margin: 5px 0;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 24px;
+            transition: all 0.3s;
+            text-align: center;
+            display: block;
+        }
+
+        .menu-btn:active {
+            transform: scale(0.95);
+        }
+
+        .menu-btn:hover {
+            background: #2980b9;
+        }
+
+        .menu-btn.active {
+            background: #27ae60;
+        }
+
+        .content {
+            flex: 1;
+            padding: 15px;
+            background: #ecf0f1;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .page-title {
+            font-size: 20px;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-weight: bold;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .stat-card.success {
+            border-top: 5px solid #27ae60;
+        }
+
+        .stat-card.primary {
+            border-top: 5px solid #3498db;
+        }
+
+        .stat-card.warning {
+            border-top: 5px solid #f39c12;
+        }
+
+        .stat-card.danger {
+            border-top: 5px solid #e74c3c;
+        }
+
+        .stat-number {
+            font-size: 36px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #7f8c8d;
+            font-weight: 500;
+        }
+
+        .activity-box {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .activity-box h3 {
+            margin-bottom: 15px;
+            color: #2c3e50;
+            font-size: 18px;
+        }
+
+        .activity-item {
+            padding: 10px;
+            border-left: 4px solid #3498db;
+            margin-bottom: 10px;
+            background: #f8f9fa;
+            font-size: 13px;
+            border-radius: 4px;
+        }
+
+        .action-buttons {
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 13px;
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+        }
+
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-warning {
+            background: #f39c12;
+            color: white;
+        }
+
+        .data-table {
+            width: 100%;
+            background: white;
+            border-radius: 10px;
+            overflow-x: auto;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .data-table table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 600px;
+        }
+
+        .data-table th {
+            background: #34495e;
+            color: white;
+            padding: 12px 8px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .data-table td {
+            padding: 10px 8px;
+            border-bottom: 1px solid #ecf0f1;
+            font-size: 13px;
+        }
+
+        .data-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .search-box {
+            margin-bottom: 15px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .info-section {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .info-section h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+
+        .features-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .features-list li {
+            padding: 12px 15px;
+            margin: 8px 0;
+            background: #f8f9fa;
+            border-left: 5px solid #3498db;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #2c3e50;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .form-group select,
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px;
+            background: #f8f9fa;
+            margin: 10px 0;
+            border-left: 5px solid #3498db;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .stat-row strong {
+            color: #2c3e50;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 18px;
+            }
+            
+            .user-info {
+                font-size: 12px;
+            }
+            
+            .sidebar {
+                width: 60px;
+                padding: 5px 3px;
+            }
+            
+            .menu-btn {
+                font-size: 20px;
+                padding: 12px 5px;
+            }
+            
+            .content {
+                padding: 10px;
+            }
+            
+            .page-title {
+                font-size: 18px;
+            }
+            
+            .stat-number {
+                font-size: 28px;
+            }
+            
+            .stats-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
     </style>
 </head>
 <body>
-
-    <aside class="sidebar">
-        <div class="logo-area">
-            <h2 id="side-school-name">SGE</h2>
-            <p>Gestion Scolaire</p>
+    <div class="app-container">
+        <div class="header">
+            <h1>🏫 SGS</h1>
+            <div class="user-info">Admin</div>
         </div>
-        <nav class="nav-menu">
-            <div class="nav-item active" onclick="showSection('dashboard')">🏠 Tableau de Bord</div>
-            <div class="nav-item" onclick="showSection('params')">⚙️ Paramètres</div>
-            <div class="nav-item" onclick="showSection('classes')">🏫 Classes</div>
-            <div class="nav-item" onclick="showSection('matieres')">📚 Matières</div>
-            <div class="nav-item" onclick="showSection('profs')">👨‍🏫 Enseignants</div>
-            <div class="nav-item" onclick="showSection('eleves')">🎓 Élèves</div>
-            <div class="nav-item" onclick="showSection('notes')">📝 Saisie des Notes</div>
-            <div class="nav-item" onclick="showSection('bulletins')">📄 Bulletins</div>
-        </nav>
-    </aside>
-
-    <main class="main-content">
-        <header>
-            <h2 id="current-title">Tableau de Bord</h2>
-            <div id="header-info">Année Scolaire: <span id="display-annee">2025-2026</span></div>
-        </header>
-
-        <div class="container">
+        
+        <div class="content-wrapper">
+            <div class="sidebar">
+                <button class="menu-btn active" onclick="showPage('dashboard')" title="Tableau de Bord">📊</button>
+                <button class="menu-btn" onclick="showPage('classes')" title="Classes">🎓</button>
+                <button class="menu-btn" onclick="showPage('eleves')" title="Élèves">👨‍🎓</button>
+                <button class="menu-btn" onclick="showPage('enseignants')" title="Enseignants">👨‍🏫</button>
+                <button class="menu-btn" onclick="showPage('matieres')" title="Matières">📚</button>
+                <button class="menu-btn" onclick="showPage('notes')" title="Notes">📝</button>
+                <button class="menu-btn" onclick="showPage('bulletins')" title="Bulletins">📋</button>
+                <button class="menu-btn" onclick="showPage('statistiques')" title="Statistiques">📈</button>
+                <button class="menu-btn" onclick="showPage('about')" title="À propos">ℹ️</button>
+            </div>
             
-            <!-- Dashboard -->
-            <section id="dashboard" class="section active">
-                <div class="stats-grid">
-                    <div class="stat-card"><h3>Élèves</h3><p id="count-eleves">0</p></div>
-                    <div class="stat-card"><h3>Classes</h3><p id="count-classes">0</p></div>
-                    <div class="stat-card"><h3>Profs</h3><p id="count-profs">0</p></div>
-                    <div class="stat-card"><h3>Moyenne G.</h3><p>--/20</p></div>
-                </div>
-            </section>
-
-            <!-- Paramètres -->
-            <section id="params" class="section">
-                <div class="card">
-                    <h3>Informations de l'Établissement</h3>
-                    <div class="form-grid">
-                        <input type="text" id="p-nom" placeholder="Nom de l'école">
-                        <input type="text" id="p-annee" placeholder="Année Scolaire (ex: 2025-2026)">
-                        <input type="text" id="p-directeur" placeholder="Nom du Directeur">
-                        <input type="text" id="p-adresse" placeholder="Adresse">
-                        <input type="email" id="p-email" placeholder="Email">
-                        <input type="text" id="p-devise" placeholder="Devise">
-                    </div>
-                    <button class="btn-add" onclick="saveParams()">Enregistrer les paramètres</button>
-                </div>
-            </section>
-
-            <!-- Classes -->
-            <section id="classes" class="section">
-                <div class="card">
-                    <h3>Ajouter une Classe</h3>
-                    <div class="form-grid">
-                        <input type="text" id="cl-nom" placeholder="Nom (ex: 3ème A)">
-                        <select id="cl-niveau">
-                            <option value="Collège">Collège</option>
-                            <option value="Lycée">Lycée</option>
-                        </select>
-                        <button class="btn-add" onclick="addData('classes')">Ajouter</button>
-                    </div>
-                </div>
-                <div class="card">
-                    <table>
-                        <thead><tr><th>Nom</th><th>Niveau</th><th>Action</th></tr></thead>
-                        <tbody id="list-classes"></tbody>
-                    </table>
-                </div>
-            </section>
-
-            <!-- Matières -->
-            <section id="matieres" class="section">
-                <div class="card">
-                    <h3>Ajouter une Matière</h3>
-                    <div class="form-grid">
-                        <input type="text" id="mat-nom" placeholder="Nom (ex: Mathématiques)">
-                        <input type="number" id="mat-coef" placeholder="Coefficient" min="1">
-                        <button class="btn-add" onclick="addData('matieres')">Ajouter</button>
-                    </div>
-                </div>
-                <div class="card">
-                    <table>
-                        <thead><tr><th>Matière</th><th>Coefficient</th><th>Action</th></tr></thead>
-                        <tbody id="list-matieres"></tbody>
-                    </table>
-                </div>
-            </section>
-
-            <!-- Profs -->
-            <section id="profs" class="section">
-                <div class="card">
-                    <h3>Ajouter un Enseignant</h3>
-                    <div class="form-grid">
-                        <input type="text" id="prof-nom" placeholder="Nom complet">
-                        <select id="prof-mat"></select>
-                        <button class="btn-add" onclick="addData('profs')">Ajouter</button>
-                    </div>
-                </div>
-                <div class="card">
-                    <table>
-                        <thead><tr><th>Nom</th><th>Matière</th><th>Action</th></tr></thead>
-                        <tbody id="list-profs"></tbody>
-                    </table>
-                </div>
-            </section>
-
-            <!-- Élèves -->
-            <section id="eleves" class="section">
-                <div class="card">
-                    <h3>Inscrire un Élève</h3>
-                    <div class="form-grid">
-                        <input type="text" id="el-nom" placeholder="Nom complet">
-                        <select id="el-sexe"><option value="M">Masculin</option><option value="F">Féminin</option></select>
-                        <select id="el-classe"></select>
-                        <button class="btn-add" onclick="addData('eleves')">Inscrire</button>
-                    </div>
-                </div>
-                <div class="card">
-                    <table>
-                        <thead><tr><th>Matricule</th><th>Nom</th><th>Classe</th><th>Action</th></tr></thead>
-                        <tbody id="list-eleves"></tbody>
-                    </table>
-                </div>
-            </section>
-
-            <!-- Saisie des Notes -->
-            <section id="notes" class="section">
-                <div class="card">
-                    <h3>Filtrer pour la saisie</h3>
-                    <div class="form-grid">
-                        <select id="note-classe" onchange="refreshNoteTable()"></select>
-                        <select id="note-matiere" onchange="refreshNoteTable()"></select>
-                    </div>
-                </div>
-                <div class="card">
-                    <table>
-                        <thead><tr><th>Élève</th><th>Note 1</th><th>Note 2</th><th>Note 3</th><th>Moyenne</th><th>Action</th></tr></thead>
-                        <tbody id="list-saisie-notes"></tbody>
-                    </table>
-                </div>
-            </section>
-
-            <!-- Bulletins -->
-            <section id="bulletins" class="section">
-                <div class="card">
-                    <h3>Générer les Bulletins</h3>
-                    <select id="bull-classe" onchange="refreshBulletinList()"></select>
-                </div>
-                <div id="list-bulletins-eleves"></div>
-            </section>
-
+            <div class="content" id="content">
+                <!-- Le contenu sera chargé ici -->
+            </div>
         </div>
-    </main>
-
-    <!-- Zone d'impression masquée -->
-    <div id="bulletin-print-zone"></div>
+    </div>
 
     <script>
-        // --- BASE DE DONNÉES LOCALE ---
-        let db = JSON.parse(localStorage.getItem('sge_db')) || {
-            params: { nom: "ÉCOLE EXEMPLE", annee: "2025-2026", directeur: "Jean Dupont", adresse: "Lomé, Togo", devise: "Discipline - Travail" },
-            classes: [],
-            matieres: [],
-            profs: [],
-            eleves: [],
-            notes: {} // Format: { matricule: { matiere: [n1, n2, n3] } }
+        const data = {
+            classes: [
+                {id: 1, nom: '6ème A', niveau: 'Collège', effectif_max: 45, effectif: 42},
+                {id: 2, nom: '6ème B', niveau: 'Collège', effectif_max: 45, effectif: 40},
+                {id: 3, nom: '5ème A', niveau: 'Collège', effectif_max: 45, effectif: 38},
+                {id: 4, nom: '4ème A', niveau: 'Collège', effectif_max: 45, effectif: 35},
+                {id: 5, nom: '3ème A', niveau: 'Collège', effectif_max: 45, effectif: 33},
+                {id: 6, nom: '2nde A', niveau: 'Lycée', effectif_max: 50, effectif: 45},
+                {id: 7, nom: '1ère C', niveau: 'Lycée', effectif_max: 45, effectif: 38},
+                {id: 8, nom: 'Terminale C', niveau: 'Lycée', effectif_max: 45, effectif: 36}
+            ],
+            eleves: [
+                {id: 1, matricule: 'E001', nom: 'KOUASSI', prenoms: 'Jean-Pierre', sexe: 'M', classe: '6ème A', telephone: '+225 01 02 03 04 05'},
+                {id: 2, matricule: 'E002', nom: 'DIALLO', prenoms: 'Fatou', sexe: 'F', classe: '6ème A', telephone: '+225 01 02 03 04 06'},
+                {id: 3, matricule: 'E003', nom: 'TRAORE', prenoms: 'Mamadou', sexe: 'M', classe: '5ème A', telephone: '+225 01 02 03 04 07'},
+                {id: 4, matricule: 'E004', nom: 'KONE', prenoms: 'Awa', sexe: 'F', classe: '4ème A', telephone: '+225 01 02 03 04 08'},
+                {id: 5, matricule: 'E005', nom: 'N\'GUESSAN', prenoms: 'Konan', sexe: 'M', classe: '3ème A', telephone: '+225 01 02 03 04 09'}
+            ],
+            enseignants: [
+                {id: 1, nom: 'AMANI', prenoms: 'Kouadio', specialite: 'Mathématiques', telephone: '+225 07 08 09 10 11', email: 'amani@sgs.edu'},
+                {id: 2, nom: 'BAMBA', prenoms: 'Marie', specialite: 'Français', telephone: '+225 07 08 09 10 12', email: 'bamba@sgs.edu'},
+                {id: 3, nom: 'COULIBALY', prenoms: 'Ibrahim', specialite: 'Anglais', telephone: '+225 07 08 09 10 13', email: 'coulibaly@sgs.edu'}
+            ],
+            matieres: [
+                {id: 1, nom: 'Mathématiques', coefficient: 4, description: 'Sciences exactes'},
+                {id: 2, nom: 'Français', coefficient: 4, description: 'Langues'},
+                {id: 3, nom: 'Anglais', coefficient: 3, description: 'Langues'},
+                {id: 4, nom: 'Sciences Physiques', coefficient: 3, description: 'Sciences'},
+                {id: 5, nom: 'SVT', coefficient: 2, description: 'Sciences de la Vie'},
+                {id: 6, nom: 'Histoire-Géographie', coefficient: 3, description: 'Sciences humaines'},
+                {id: 7, nom: 'EPS', coefficient: 1, description: 'Sport'}
+            ],
+            notes: [
+                {id: 1, eleve: 'KOUASSI Jean-Pierre', matiere: 'Mathématiques', note: 15.5, sur: 20, type: 'Devoir', periode: 'Trimestre 1', date: '15/01/2026'},
+                {id: 2, eleve: 'DIALLO Fatou', matiere: 'Français', note: 14.0, sur: 20, type: 'Composition', periode: 'Trimestre 1', date: '14/01/2026'},
+                {id: 3, eleve: 'TRAORE Mamadou', matiere: 'Anglais', note: 16.5, sur: 20, type: 'Contrôle', periode: 'Trimestre 1', date: '13/01/2026'}
+            ]
         };
 
-        function saveDB() {
-            localStorage.setItem('sge_db', JSON.stringify(db));
-            updateUI();
-        }
+        function showPage(page) {
+            document.querySelectorAll('.menu-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            const content = document.getElementById('content');
+            content.scrollTop = 0;
 
-        // --- NAVIGATION ---
-        function showSection(id) {
-            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-            event.currentTarget.classList.add('active');
-            document.getElementById('current-title').innerText = event.currentTarget.innerText;
-            updateUI();
-        }
-
-        // --- LOGIQUE GÉNÉRIQUE ---
-        function addData(type) {
-            if (type === 'classes') {
-                db.classes.push({ id: Date.now(), nom: document.getElementById('cl-nom').value, niveau: document.getElementById('cl-niveau').value });
-            } else if (type === 'matieres') {
-                db.matieres.push({ id: Date.now(), nom: document.getElementById('mat-nom').value, coef: document.getElementById('mat-coef').value });
-            } else if (type === 'profs') {
-                db.profs.push({ id: Date.now(), nom: document.getElementById('prof-nom').value, mat: document.getElementById('prof-mat').value });
-            } else if (type === 'eleves') {
-                let matricule = "MAT" + Math.floor(1000 + Math.random() * 9000);
-                db.eleves.push({ matricule, nom: document.getElementById('el-nom').value, classe: document.getElementById('el-classe').value, sexe: document.getElementById('el-sexe').value });
+            switch(page) {
+                case 'dashboard': showDashboard(); break;
+                case 'classes': showClasses(); break;
+                case 'eleves': showEleves(); break;
+                case 'enseignants': showEnseignants(); break;
+                case 'matieres': showMatieres(); break;
+                case 'notes': showNotes(); break;
+                case 'bulletins': showBulletins(); break;
+                case 'statistiques': showStatistiques(); break;
+                case 'about': showAbout(); break;
             }
-            saveDB();
         }
 
-        function deleteData(type, index) {
-            db[type].splice(index, 1);
-            saveDB();
-        }
-
-        function saveParams() {
-            db.params = {
-                nom: document.getElementById('p-nom').value,
-                annee: document.getElementById('p-annee').value,
-                directeur: document.getElementById('p-directeur').value,
-                adresse: document.getElementById('p-adresse').value,
-                email: document.getElementById('p-email').value,
-                devise: document.getElementById('p-devise').value
-            };
-            saveDB();
-            alert("Paramètres enregistrés !");
-        }
-
-        // --- GESTION DES NOTES ---
-        function saveNote(matricule) {
-            let n1 = parseFloat(document.getElementById(`n1-${matricule}`).value) || 0;
-            let n2 = parseFloat(document.getElementById(`n2-${matricule}`).value) || 0;
-            let n3 = parseFloat(document.getElementById(`n3-${matricule}`).value) || 0;
-            let matiere = document.getElementById('note-matiere').value;
-
-            if(!db.notes[matricule]) db.notes[matricule] = {};
-            db.notes[matricule][matiere] = [n1, n2, n3];
-            
-            let moy = ((n1 + n2 + n3) / 3).toFixed(2);
-            document.getElementById(`moy-${matricule}`).innerText = moy;
-            saveDB();
-        }
-
-        // --- MISE À JOUR DE L'INTERFACE ---
-        function updateUI() {
-            // Dashboard
-            document.getElementById('count-eleves').innerText = db.eleves.length;
-            document.getElementById('count-classes').innerText = db.classes.length;
-            document.getElementById('count-profs').innerText = db.profs.length;
-            document.getElementById('display-annee').innerText = db.params.annee;
-            document.getElementById('side-school-name').innerText = db.params.nom;
-
-            // Listes
-            renderTable('list-classes', db.classes, (item, i) => `<td>${item.nom}</td><td>${item.niveau}</td><td><button class="btn-danger" onclick="deleteData('classes', ${i})">Supprimer</button></td>`);
-            renderTable('list-matieres', db.matieres, (item, i) => `<td>${item.nom}</td><td>${item.coef}</td><td><button class="btn-danger" onclick="deleteData('matieres', ${i})">Supprimer</button></td>`);
-            renderTable('list-profs', db.profs, (item, i) => `<td>${item.nom}</td><td>${item.mat}</td><td><button class="btn-danger" onclick="deleteData('profs', ${i})">Supprimer</button></td>`);
-            renderTable('list-eleves', db.eleves, (item, i) => `<td>${item.matricule}</td><td>${item.nom}</td><td>${item.classe}</td><td><button class="btn-danger" onclick="deleteData('eleves', ${i})">Supprimer</button></td>`);
-
-            // Remplissage des Selects
-            fillSelect('prof-mat', db.matieres.map(m => m.nom));
-            fillSelect('el-classe', db.classes.map(c => c.nom));
-            fillSelect('note-classe', db.classes.map(c => c.nom));
-            fillSelect('note-matiere', db.matieres.map(m => m.nom));
-            fillSelect('bull-classe', db.classes.map(c => c.nom));
-
-            // Champs paramètres
-            document.getElementById('p-nom').value = db.params.nom;
-            document.getElementById('p-annee').value = db.params.annee;
-        }
-
-        function renderTable(id, data, rowFn) {
-            let tbody = document.getElementById(id);
-            if(!tbody) return;
-            tbody.innerHTML = data.map((item, i) => `<tr>${rowFn(item, i)}</tr>`).join('');
-        }
-
-        function fillSelect(id, list) {
-            let select = document.getElementById(id);
-            if(!select) return;
-            let val = select.value;
-            select.innerHTML = list.map(item => `<option value="${item}">${item}</option>`).join('');
-            if(val) select.value = val;
-        }
-
-        function refreshNoteTable() {
-            let classe = document.getElementById('note-classe').value;
-            let matiere = document.getElementById('note-matiere').value;
-            let eleves = db.eleves.filter(e => e.classe === classe);
-            
-            let html = eleves.map(e => {
-                let notes = (db.notes[e.matricule] && db.notes[e.matricule][matiere]) ? db.notes[e.matricule][matiere] : [0,0,0];
-                let moy = ((notes[0] + notes[1] + notes[2])/3).toFixed(2);
-                return `
-                    <tr>
-                        <td>${e.nom}</td>
-                        <td><input type="number" id="n1-${e.matricule}" value="${notes[0]}" step="0.25" onchange="saveNote('${e.matricule}')"></td>
-                        <td><input type="number" id="n2-${e.matricule}" value="${notes[1]}" step="0.25" onchange="saveNote('${e.matricule}')"></td>
-                        <td><input type="number" id="n3-${e.matricule}" value="${notes[2]}" step="0.25" onchange="saveNote('${e.matricule}')"></td>
-                        <td id="moy-${e.matricule}">${moy}</td>
-                        <td>✅</td>
-                    </tr>
-                `;
-            }).join('');
-            document.getElementById('list-saisie-notes').innerHTML = html;
-        }
-
-        function refreshBulletinList() {
-            let classe = document.getElementById('bull-classe').value;
-            let eleves = db.eleves.filter(e => e.classe === classe);
-            let html = eleves.map(e => `
-                <div class="card" style="display:flex; justify-content:space-between; align-items:center;">
-                    <span>${e.nom} (${e.matricule})</span>
-                    <button class="btn-print" onclick="printBulletin('${e.matricule}')">Générer Bulletin</button>
+        function showDashboard() {
+            const content = document.getElementById('content');
+            content.innerHTML = `
+                <h2 class="page-title">TABLEAU DE BORD</h2>
+                
+                <div class="stats-container">
+                    <div class="stat-card success">
+                        <div class="stat-number">${data.classes.length}</div>
+                        <div class="stat-label">Classes</div>
+                    </div>
+                    <div class="stat-card primary">
+                        <div class="stat-number">${data.eleves.length}</div>
+                        <div class="stat-label">Élèves</div>
+                    </div>
+                    <div class="stat-card warning">
+                        <div class="stat-number">${data.enseignants.length}</div>
+                        <div class="stat-label">Enseignants</div>
+                    </div>
+                    <div class="stat-card danger">
+                        <div class="stat-number">${data.notes.length}</div>
+                        <div class="stat-label">Notes</div>
+                    </div>
                 </div>
+
+                <div class="activity-box">
+                    <h3>📋 Activités Récentes</h3>
+                    <div class="activity-item">• ${new Date().toLocaleDateString('fr-FR')} ${new Date().toLocaleTimeString('fr-FR')} - Application démarrée</div>
+                    <div class="activity-item">• Base de données: ${data.classes.length} classes actives</div>
+                    <div class="activity-item">• Total élèves inscrits: ${data.eleves.length}</div>
+                    <div class="activity-item">• Total notes enregistrées: ${data.notes.length}</div>
+                    <div class="activity-item">• Système opérationnel - Aucune erreur détectée</div>
+                </div>
+            `;
+        }
+
+        function showClasses() {
+            const content = document.getElementById('content');
+            let rows = data.classes.map(c => `
+                <tr>
+                    <td>${c.id}</td>
+                    <td><strong>${c.nom}</strong></td>
+                    <td>${c.niveau}</td>
+                    <td>${c.effectif_max}</td>
+                    <td><strong style="color: #27ae60">${c.effectif}</strong></td>
+                </tr>
             `).join('');
-            document.getElementById('list-bulletins-eleves').innerHTML = html;
+
+            content.innerHTML = `
+                <h2 class="page-title">GESTION DES CLASSES</h2>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-success" onclick="alert('➕ Ajouter une nouvelle classe')">➕ Nouvelle</button>
+                    <button class="btn btn-primary" onclick="showClasses()">🔄 Actualiser</button>
+                </div>
+
+                <div class="data-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nom</th>
+                                <th>Niveau</th>
+                                <th>Max</th>
+                                <th>Actuel</th>
+                            </tr>
+                        </thead>
+                        <tbody>${rows}</tbody>
+                    </table>
+                </div>
+            `;
         }
 
-        // --- GÉNÉRATION DU BULLETIN ---
-        function printBulletin(matricule) {
-            let eleve = db.eleves.find(e => e.matricule === matricule);
-            let p = db.params;
-            let html = `
-                <div class="bulletin-header">
-                    <div><h1>${p.nom}</h1><p>${p.adresse}</p><p>${p.email}</p></div>
-                    <div style="text-align:right"><h2>BULLETIN DE NOTES</h2><p>Année: ${p.annee}</p><strong>${p.devise}</strong></div>
-                </div>
-                <div style="margin: 20px 0; border: 1px solid #000; padding: 10px;">
-                    <p><strong>Nom & Prénoms :</strong> ${eleve.nom}</p>
-                    <p><strong>Classe :</strong> ${eleve.classe} | <strong>Matricule :</strong> ${eleve.matricule}</p>
-                </div>
-                <table>
-                    <thead>
-                        <tr><th>Matières</th><th>Coef</th><th>Moy/20</th><th>Moy Coef</th><th>Appréciation</th></tr>
-                    </thead>
-                    <tbody>
-            `;
-
-            let totalPoints = 0;
-            let totalCoef = 0;
-
-            db.matieres.forEach(m => {
-                let notes = (db.notes[matricule] && db.notes[matricule][m.nom]) ? db.notes[matricule][m.nom] : [0,0,0];
-                let moy = (notes[0] + notes[1] + notes[2]) / 3;
-                let moyCoef = moy * m.coef;
-                totalPoints += moyCoef;
-                totalCoef += parseInt(m.coef);
-
-                html += `
+        function showEleves() {
+            const content = document.getElementById('content');
+            
+            function renderTable(eleves) {
+                return eleves.map(e => `
                     <tr>
-                        <td>${m.nom}</td>
-                        <td>${m.coef}</td>
-                        <td>${moy.toFixed(2)}</td>
-                        <td>${moyCoef.toFixed(2)}</td>
-                        <td>${moy >= 10 ? 'Bien' : 'Insuffisant'}</td>
+                        <td>${e.matricule}</td>
+                        <td><strong>${e.nom}</strong></td>
+                        <td>${e.prenoms}</td>
+                        <td>${e.sexe}</td>
+                        <td>${e.classe}</td>
                     </tr>
-                `;
-            });
+                `).join('');
+            }
 
-            let moyGen = totalPoints / totalCoef;
+            content.innerHTML = `
+                <h2 class="page-title">GESTION DES ÉLÈVES</h2>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-success" onclick="alert('➕ Nouvel élève')">➕ Nouveau</button>
+                    <button class="btn btn-warning" onclick="alert('📥 Export CSV')">📥 Export</button>
+                </div>
 
-            html += `
-                    </tbody>
-                </table>
-                <div class="moyenne-generale">MOYENNE GÉNÉRALE : ${moyGen.toFixed(2)} / 20</div>
-                <div style="margin-top:50px; display:flex; justify-content:space-between">
-                    <div>L'Intendant</div>
-                    <div>Le Parent</div>
-                    <div>Le Directeur<br><br><strong>${p.directeur}</strong></div>
+                <div class="search-box">
+                    <input type="text" placeholder="🔍 Rechercher un élève..." oninput="filterEleves(this.value)">
+                </div>
+
+                <div class="data-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Matricule</th>
+                                <th>Nom</th>
+                                <th>Prénoms</th>
+                                <th>Sexe</th>
+                                <th>Classe</th>
+                            </tr>
+                        </thead>
+                        <tbody id="elevesTableBody">${renderTable(data.eleves)}</tbody>
+                    </table>
                 </div>
             `;
-
-            document.getElementById('bulletin-print-zone').innerHTML = html;
-            window.print();
         }
 
-        // Init
-        window.onload = updateUI;
-    </script>
-</body>
-</html>
+        function filterEleves(term) {
+            const filtered = data.eleves.filter(e => 
+                e.nom.toLowerCase().includes(term.toLowerCase()) ||
+                e.prenoms.toLowerCase().includes(term.toLowerCase()) ||
+                e.matricule.toLowerCase().includes(term.toLowerCase())
+            );
+
+            const tbody = document.getElementById('elevesTableBody');
+            tbody.innerHTML = filtered.map(e => `
+                <tr>
+                    <td>${e.matricule}</td>
+                    <td><strong>${e.nom}</strong></td>
+                    <td>${e.prenoms}</td>
+                    <td>${e.sexe}</td>
+                    <td>${e.classe}</td>
+                </tr>
+            `).join('') || '<tr><td colspan="5" style="text-align:center; padding:20px; color:#999">Aucun élève trouvé</td></tr>';
+        }
+
+        function showEnseignants() {
+            const content = document.getElementById('content');
+            let rows = data.enseignants.map(e => `
+                <tr>
+                    <td><strong>${e.nom}</strong></td>
+                    <td>${e.prenoms}</td>
+                    <td>${e.specialite}</td>
+                    <td>${e.email}</td>
+                </tr>
+            `).join('');
+
+            conten
