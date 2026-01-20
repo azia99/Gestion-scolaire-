@@ -1,395 +1,152 @@
-ap(c => `
-                <tr>
-                    <td>${c.id}</td>
-                    <td><strong>${c.matricule}</strong></td>
-                    <td>${c.nom} ${c.prenoms}</td>
-                    <td>${c.sexe}</td>
-                    <td>${c.classe}</td>
-                    <td>${c.tel}</td>
-                </tr>
-            `).join('');
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>SGS - Système de Gestion Scolaire</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body{margin:0;font-family:Segoe UI;background:#ecf0f1}
+.hidden{display:none}
+.header{background:#2c3e50;color:#fff;padding:15px;display:flex;justify-content:space-between}
+.sidebar{width:230px;background:#34495e;color:#fff;height:100vh;position:fixed}
+.sidebar button{width:100%;padding:14px;border:none;background:none;color:#fff;text-align:left;cursor:pointer}
+.sidebar button:hover,.sidebar .active{background:#27ae60}
+.main{margin-left:230px;padding:20px}
+.card{background:#fff;padding:20px;border-radius:10px;margin-bottom:15px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:15px}
+.stat{padding:20px;border-radius:10px;color:#fff;font-size:22px}
+.green{background:#27ae60}.blue{background:#3498db}.orange{background:#f39c12}.red{background:#e74c3c}
+table{width:100%;border-collapse:collapse}
+th,td{padding:10px;border-bottom:1px solid #ddd}
+th{background:#34495e;color:#fff}
+button{cursor:pointer}
+.modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center}
+.modal-content{background:#fff;padding:20px;width:90%;max-width:400px;border-radius:10px}
+input,select{width:100%;padding:8px;margin-bottom:10px}
+.login{display:flex;justify-content:center;align-items:center;height:100vh}
+.login-box{background:#fff;padding:30px;border-radius:10px;width:300px}
+</style>
+</head>
+<body>
 
-            document.getElementById('content').innerHTML = `
-                <h2 class="page-title">👨‍🎓 GESTION DES ÉLÈVES</h2>
-                <div class="action-buttons">
-                    <button class="btn btn-success" onclick="openAddEleve()">➕ Nouvel Élève</button>
-                </div>
-                <div class="data-table">
-                    <table>
-                        <thead>
-                            <tr><th>ID</th><th>Matricule</th><th>Nom</th><th>Sexe</th><th>Classe</th><th>Téléphone</th></tr>
-                        </thead>
-                        <tbody>${rows}</tbody>
-                    </table>
-                </div>
-            `;
-        }
+<!-- LOGIN -->
+<div class="login" id="login">
+  <div class="login-box">
+    <h2>🏫 SGS</h2>
+    <input id="user" placeholder="Identifiant">
+    <input id="pass" type="password" placeholder="Mot de passe">
+    <button onclick="login()">Se connecter</button>
+    <p id="error" style="color:red"></p>
+  </div>
+</div>
 
-        function openAddEleve() {
-            showModal(`
-                <div class="modal-header">
-                    <h2>➕ Nouvel Élève</h2>
-                    <button class="close-btn" onclick="closeModal()">×</button>
-                </div>
-                <form onsubmit="saveEleve(event)">
-                    <div class="form-group">
-                        <label>Matricule :</label>
-                        <input type="text" id="matricule" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Nom :</label>
-                        <input type="text" id="nomE" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Prénoms :</label>
-                        <input type="text" id="prenoms" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Sexe :</label>
-                        <select id="sexe" required>
-                            <option value="">Sélectionner</option>
-                            <option value="M">Masculin</option>
-                            <option value="F">Féminin</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Classe :</label>
-                        <input type="text" id="classe" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Téléphone :</label>
-                        <input type="text" id="tel" required>
-                    </div>
-                    <div class="action-buttons">
-                        <button type="submit" class="btn btn-success">✅ Enregistrer</button>
-                        <button type="button" class="btn btn-danger" onclick="closeModal()">❌ Annuler</button>
-                    </div>
-                </form>
-            `);
-        }
+<!-- APP -->
+<div id="app" class="hidden">
+  <div class="header">
+    <b>SGS | Année 2025-2026</b>
+    <button onclick="logout()">Déconnexion</button>
+  </div>
 
-        function saveEleve(e) {
-            e.preventDefault();
-            const newId = Math.max(...APP_DATA.eleves.map(e => e.id), 0) + 1;
-            APP_DATA.eleves.push({
-                id: newId,
-                matricule: document.getElementById('matricule').value,
-                nom: document.getElementById('nomE').value,
-                prenoms: document.getElementById('prenoms').value,
-                sexe: document.getElementById('sexe').value,
-                classe: document.getElementById('classe').value,
-                tel: document.getElementById('tel').value
-            });
-            closeModal();
-            renderEleves();
-            alert('✅ Élève ajouté avec succès !');
-        }
+  <div class="sidebar">
+    <button class="active" onclick="page('dashboard',this)">📊 Tableau de bord</button>
+    <button onclick="page('classes',this)">🎓 Classes</button>
+    <button onclick="page('eleves',this)">👨‍🎓 Élèves</button>
+    <button onclick="page('notes',this)">📝 Notes</button>
+    <button onclick="page('bulletins',this)">📋 Bulletins</button>
+  </div>
 
-        // Gestion des enseignants
-        function renderEnseignants() {
-            const rows = APP_DATA.enseignants.map(e => `
-                <tr>
-                    <td>${e.id}</td>
-                    <td>${e.nom} ${e.prenoms}</td>
-                    <td>${e.specialite}</td>
-                    <td>${e.tel}</td>
-                    <td>${e.email}</td>
-                </tr>
-            `).join('');
+  <div class="main" id="content"></div>
+</div>
 
-            document.getElementById('content').innerHTML = `
-                <h2 class="page-title">👨‍🏫 GESTION DES ENSEIGNANTS</h2>
-                <div class="action-buttons">
-                    <button class="btn btn-success" onclick="openAddEnseignant()">➕ Nouvel Enseignant</button>
-                </div>
-                <div class="data-table">
-                    <table>
-                        <thead>
-                            <tr><th>ID</th><th>Nom complet</th><th>Spécialité</th><th>Téléphone</th><th>Email</th></tr>
-                        </thead>
-                        <tbody>${rows}</tbody>
-                    </table>
-                </div>
-            `;
-        }
+<!-- MODAL -->
+<div class="modal" id="modal">
+  <div class="modal-content" id="modalContent"></div>
+</div>
 
-        function openAddEnseignant() {
-            showModal(`
-                <div class="modal-header">
-                    <h2>➕ Nouvel Enseignant</h2>
-                    <button class="close-btn" onclick="closeModal()">×</button>
-                </div>
-                <form onsubmit="saveEnseignant(event)">
-                    <div class="form-group">
-                        <label>Nom :</label>
-                        <input type="text" id="nomEns" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Prénoms :</label>
-                        <input type="text" id="prenomsEns" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Spécialité :</label>
-                        <input type="text" id="specialite" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Téléphone :</label>
-                        <input type="text" id="telEns" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Email :</label>
-                        <input type="email" id="emailEns" required>
-                    </div>
-                    <div class="action-buttons">
-                        <button type="submit" class="btn btn-success">✅ Enregistrer</button>
-                        <button type="button" class="btn btn-danger" onclick="closeModal()">❌ Annuler</button>
-                    </div>
-                </form>
-            `);
-        }
+<script>
+const DATA={
+user:"admin",pass:"admin",
+classes:["6ème A","5ème A"],
+eleves:[
+{mat:"E001",nom:"KOUASSI",prenom:"Jean",classe:"6ème A"}
+],
+notes:[
+{eleve:"E001",matiere:"Maths",note:15,coef:4}
+]
+};
 
-        function saveEnseignant(e) {
-            e.preventDefault();
-            const newId = Math.max(...APP_DATA.enseignants.map(e => e.id), 0) + 1;
-            APP_DATA.enseignants.push({
-                id: newId,
-                nom: document.getElementById('nomEns').value,
-                prenoms: document.getElementById('prenomsEns').value,
-                specialite: document.getElementById('specialite').value,
-                tel: document.getElementById('telEns').value,
-                email: document.getElementById('emailEns').value
-            });
-            closeModal();
-            renderEnseignants();
-            alert('✅ Enseignant ajouté avec succès !');
-        }
+function login(){
+ if(user.value==DATA.user&&pass.value==DATA.pass){
+  loginDiv.style.display="none";app.classList.remove("hidden");dashboard();
+ } else error.innerText="Accès refusé";
+}
+function logout(){location.reload()}
 
-        // Gestion des matières
-        function renderMatieres() {
-            const rows = APP_DATA.matieres.map(m => `
-                <tr>
-                    <td>${m.id}</td>
-                    <td>${m.nom}</td>
-                    <td>${m.coef}</td>
-                    <td>${m.desc}</td>
-                </tr>
-            `).join('');
+function page(p,btn){
+ document.querySelectorAll(".sidebar button").forEach(b=>b.classList.remove("active"));
+ btn.classList.add("active");
+ window[p]();
+}
 
-            document.getElementById('content').innerHTML = `
-                <h2 class="page-title">📚 GESTION DES MATIÈRES</h2>
-                <div class="action-buttons">
-                    <button class="btn btn-success" onclick="openAddMatiere()">➕ Nouvelle Matière</button>
-                </div>
-                <div class="data-table">
-                    <table>
-                        <thead>
-                            <tr><th>ID</th><th>Nom</th><th>Coefficient</th><th>Description</th></tr>
-                        </thead>
-                        <tbody>${rows}</tbody>
-                    </table>
-                </div>
-            `;
-        }
+function dashboard(){
+ content.innerHTML=`
+ <h2>TABLEAU DE BORD</h2>
+ <div class="stats">
+  <div class="stat green">${DATA.classes.length}<br>Classes</div>
+  <div class="stat blue">${DATA.eleves.length}<br>Élèves</div>
+  <div class="stat orange">${DATA.notes.length}<br>Notes</div>
+ </div>`;
+}
 
-        function openAddMatiere() {
-            showModal(`
-                <div class="modal-header">
-                    <h2>➕ Nouvelle Matière</h2>
-                    <button class="close-btn" onclick="closeModal()">×</button>
-                </div>
-                <form onsubmit="saveMatiere(event)">
-                    <div class="form-group">
-                        <label>Nom de la matière :</label>
-                        <input type="text" id="nomMatiere" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Coefficient :</label>
-                        <input type="number" id="coef" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Description :</label>
-                        <input type="text" id="desc" required>
-                    </div>
-                    <div class="action-buttons">
-                        <button type="submit" class="btn btn-success">✅ Enregistrer</button>
-                        <button type="button" class="btn btn-danger" onclick="closeModal()">❌ Annuler</button>
-                    </div>
-                </form>
-            `);
-        }
+function classes(){
+ content.innerHTML=`
+ <h2>CLASSES</h2>
+ <button onclick="addClasse()">➕ Classe</button>
+ <ul>${DATA.classes.map(c=>"<li>"+c+"</li>").join("")}</ul>`;
+}
 
-        function saveMatiere(e) {
-            e.preventDefault();
-            const newId = Math.max(...APP_DATA.matieres.map(m => m.id), 0) + 1;
-            APP_DATA.matieres.push({
-                id: newId,
-                nom: document.getElementById('nomMatiere').value,
-                coef: parseInt(document.getElementById('coef').value),
-                desc: document.getElementById('desc').value
-            });
-            closeModal();
-            renderMatieres();
-            alert('✅ Matière ajoutée avec succès !');
-        }
+function eleves(){
+ content.innerHTML=`
+ <h2>ÉLÈVES</h2>
+ <button onclick="addEleve()">➕ Élève</button>
+ <table>
+ <tr><th>Mat</th><th>Nom</th><th>Classe</th></tr>
+ ${DATA.eleves.map(e=>`<tr><td>${e.mat}</td><td>${e.nom} ${e.prenom}</td><td>${e.classe}</td></tr>`).join("")}
+ </table>`;
+}
 
-        // Gestion des notes
-        function renderNotes() {
-            const rows = APP_DATA.notes.map(n => `
-                <tr>
-                    <td>${n.id}</td>
-                    <td>${n.eleve}</td>
-                    <td>${n.matiere}</td>
-                    <td>${n.note}</td>
-                    <td>${n.type}</td>
-                    <td>${n.date}</td>
-                </tr>
-            `).join('');
+function notes(){
+ content.innerHTML=`
+ <h2>NOTES</h2>
+ <table>
+ <tr><th>Élève</th><th>Matière</th><th>Note</th></tr>
+ ${DATA.notes.map(n=>`<tr><td>${n.eleve}</td><td>${n.matiere}</td><td>${n.note}</td></tr>`).join("")}
+ </table>`;
+}
 
-            document.getElementById('content').innerHTML = `
-                <h2 class="page-title">📝 GESTION DES NOTES</h2>
-                <div class="action-buttons">
-                    <button class="btn btn-success" onclick="openAddNote()">➕ Nouvelle Note</button>
-                </div>
-                <div class="data-table">
-                    <table>
-                        <thead>
-                            <tr><th>ID</th><th>Élève</th><th>Matière</th><th>Note</th><th>Type</th><th>Date</th></tr>
-                        </thead>
-                        <tbody>${rows}</tbody>
-                    </table>
-                </div>
-            `;
-        }
+function bulletins(){
+ content.innerHTML=`
+ <h2>BULLETIN (Preview)</h2>
+ <div class="card">
+ Élève : ${DATA.eleves[0].nom} ${DATA.eleves[0].prenom}<br>
+ Moyenne : ${(DATA.notes[0].note*DATA.notes[0].coef)/DATA.notes[0].coef}/20
+ </div>`;
+}
 
-        function openAddNote() {
-            showModal(`
-                <div class="modal-header">
-                    <h2>➕ Nouvelle Note</h2>
-                    <button class="close-btn" onclick="closeModal()">×</button>
-                </div>
-                <form onsubmit="saveNote(event)">
-                    <div class="form-group">
-                        <label>Élève :</label>
-                        <input type="text" id="eleveNote" placeholder="Nom complet" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Matière :</label>
-                        <input type="text" id="matiereNote" placeholder="Nom de la matière" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Note :</label>
-                        <input type="number" id="note" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Type :</label>
-                        <input type="text" id="type" placeholder="Devoir, Examen, etc." required>
-                    </div>
-                    <div class="form-group">
-                        <label>Date :</label>
-                        <input type="date" id="dateNote" required>
-                    </div>
-                    <div class="action-buttons">
-                        <button type="submit" class="btn btn-success">✅ Enregistrer</button>
-                        <button type="button" class="btn btn-danger" onclick="closeModal()">❌ Annuler</button>
-                    </div>
-                </form>
-            `);
-        }
-
-        function saveNote(e) {
-            e.preventDefault();
-            const newId = Math.max(...APP_DATA.notes.map(n => n.id), 0) + 1;
-            APP_DATA.notes.push({
-                id: newId,
-                eleve: document.getElementById('eleveNote').value,
-                matiere: document.getElementById('matiereNote').value,
-                note: parseFloat(document.getElementById('note').value),
-                type: document.getElementById('type').value,
-                date: document.getElementById('dateNote').value
-            });
-            closeModal();
-            renderNotes();
-            alert('✅ Note ajoutée avec succès !');
-        }
-
-        // Gestion des bulletins
-        function renderBulletins() {
-            document.getElementById('content').innerHTML = `
-                <h2 class="page-title">📋 GESTION DES BULLETINS</h2>
-                <p>Fonctionnalité à venir...</p>
-            `;
-        }
-
-        // Statistiques
-        function renderStatistiques() {
-            document.getElementById('content').innerHTML = `
-                <h2 class="page-title">📈 STATISTIQUES</h2>
-                <p>Fonctionnalité à venir...</p>
-            `;
-        }
-
-        // Paramètres
-        function renderParametres() {
-            document.getElementById('content').innerHTML = `
-                <h2 class="page-title">⚙️ PARAMÈTRES</h2>
-                <div class="info-section">
-                    <h3>Paramètres de l'établissement</h3>
-                    <form onsubmit="saveParameters(event)">
-                        <div class="form-group">
-                            <label>Nom de l'établissement :</label>
-                            <input type="text" id="etablissement" value="${APP_DATA.settings.etablissement}" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Année académique :</label>
-                            <input type="text" id="annee" value="${APP_DATA.settings.annee}" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Trimestre :</label>
-                            <select id="trimestre" required>
-                                <option value="Trimestre 1" ${APP_DATA.settings.trimestre === 'Trimestre 1' ? 'selected' : ''}>Trimestre 1</option>
-                                <option value="Trimestre 2" ${APP_DATA.settings.trimestre === 'Trimestre 2' ? 'selected' : ''}>Trimestre 2</option>
-                                <option value="Trimestre 3" ${APP_DATA.settings.trimestre === 'Trimestre 3' ? 'selected' : ''}>Trimestre 3</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Modifier Identifiant :</label>
-                            <input type="text" id="newUsername" value="${APP_DATA.auth.username}" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Modifier Mot de passe :</label>
-                            <input type="password" id="newPassword" required>
-                        </div>
-                        <div class="action-buttons">
-                            <button type="submit" class="btn btn-success">✅ Enregistrer Modifications</button>
-                        </div>
-                    </form>
-                </div>
-            `;
-        }
-
-        function saveParameters(e) {
-            e.preventDefault();
-            APP_DATA.settings.etablissement = document.getElementById('etablissement').value;
-            APP_DATA.settings.annee = document.getElementById('annee').value;
-            APP_DATA.settings.trimestre = document.getElementById('trimestre').value;
-            APP_DATA.auth.username = document.getElementById('newUsername').value;
-            APP_DATA.auth.password = document.getElementById('newPassword').value;
-
-            updateHeader();
-            closeModal(); // Close modal if open
-            renderParametres(); // Re-render the parameters to show updated info
-            alert('✅ Paramètres mis à jour avec succès !');
-        }
-
-        // Modal functions
-        function showModal(content) {
-            document.getElementById('modalContent').innerHTML = content;
-            document.getElementById('modal').classList.add('active');
-        }
-
-        function closeModal() {
-            document.getElementById('modal').classList.remove('active');
-        }
-    </script>
+function addClasse(){
+ showModal(`<h3>Nouvelle classe</h3>
+ <input id="c"><button onclick="DATA.classes.push(c.value);close()">Enregistrer</button>`);
+}
+function addEleve(){
+ showModal(`<h3>Nouvel élève</h3>
+ <input id="m" placeholder="Matricule">
+ <input id="n" placeholder="Nom">
+ <input id="p" placeholder="Prénom">
+ <select id="cl">${DATA.classes.map(c=>`<option>${c}</option>`)}</select>
+ <button onclick="DATA.eleves.push({mat:m.value,nom:n.value,prenom:p.value,classe:cl.value});close()">Enregistrer</button>`);
+}
+function showModal(h){modal.style.display="flex";modalContent.innerHTML=h}
+function close(){modal.style.display="none";eleves()}
+</script>
 </body>
 </html>
