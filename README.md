@@ -593,4 +593,259 @@
                 </tr>
             `).join('');
 
-            conten
+            content.innerHTML = `
+                <h2 class="page-title">GESTION DES ENSEIGNANTS</h2>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-success" onclick="alert('➕ Nouvel enseignant')">➕ Nouveau</button>
+                    <button class="btn btn-primary" onclick="showEnseignants()">🔄 Actualiser</button>
+                </div>
+
+                <div class="data-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nom</th>
+                                <th>Prénoms</th>
+                                <th>Spécialité</th>
+                                <th>Email</th>
+                            </tr>
+                        </thead>
+                        <tbody>${rows}</tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        function showMatieres() {
+            const content = document.getElementById('content');
+            let rows = data.matieres.map(m => `
+                <tr>
+                    <td>${m.id}</td>
+                    <td><strong>${m.nom}</strong></td>
+                    <td>${m.coefficient}</td>
+                    <td>${m.description}</td>
+                </tr>
+            `).join('');
+
+            content.innerHTML = `
+                <h2 class="page-title">GESTION DES MATIÈRES</h2>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-success" onclick="alert('➕ Nouvelle matière')">➕ Nouveau</button>
+                    <button class="btn btn-primary" onclick="showMatieres()">🔄 Actualiser</button>
+                </div>
+
+                <div class="data-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Matière</th>
+                                <th>Coef.</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>${rows}</tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        function showNotes() {
+            const content = document.getElementById('content');
+            let rows = data.notes.map(n => `
+                <tr>
+                    <td>${n.eleve}</td>
+                    <td>${n.matiere}</td>
+                    <td><strong style="color: #27ae60">${n.note}/${n.sur}</strong></td>
+                    <td>${n.type}</td>
+                    <td>${n.date}</td>
+                </tr>
+            `).join('');
+
+            content.innerHTML = `
+                <h2 class="page-title">GESTION DES NOTES</h2>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-success" onclick="alert('➕ Nouvelle note')">➕ Nouveau</button>
+                    <button class="btn btn-warning" onclick="alert('📊 Statistiques')">📊 Stats</button>
+                </div>
+
+                <div class="data-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Élève</th>
+                                <th>Matière</th>
+                                <th>Note</th>
+                                <th>Type</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>${rows}</tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        function showBulletins() {
+            const content = document.getElementById('content');
+            content.innerHTML = `
+                <h2 class="page-title">GESTION DES BULLETINS</h2>
+                
+                <div class="info-section">
+                    <h2>📋 Génération de Bulletins</h2>
+                    
+                    <div class="form-group">
+                        <label>Sélectionner une classe :</label>
+                        <select>
+                            <option>-- Choisir une classe --</option>
+                            ${data.classes.map(c => `<option>${c.nom}</option>`).join('')}
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Période :</label>
+                        <select>
+                            <option>Trimestre 1</option>
+                            <option>Trimestre 2</option>
+                            <option>Trimestre 3</option>
+                        </select>
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button class="btn btn-success" onclick="alert('✅ Bulletin généré!')">📄 Générer Bulletin</button>
+                        <button class="btn btn-primary" onclick="alert('📥 Export PDF')">📥 Export PDF</button>
+                    </div>
+                </div>
+
+                <div class="activity-box">
+                    <h3>📊 Aperçu des Résultats</h3>
+                    <div class="stat-row">
+                        <span>Moyenne Générale</span>
+                        <strong>12.5 / 20</strong>
+                    </div>
+                    <div class="stat-row">
+                        <span>1er de Classe</span>
+                        <strong>DIALLO Fatou (16.5/20)</strong>
+                    </div>
+                    <div class="stat-row">
+                        <span>Taux de Réussite</span>
+                        <strong>85%</strong>
+                    </div>
+                </div>
+            `;
+        }
+
+        function showStatistiques() {
+            const content = document.getElementById('content');
+            content.innerHTML = `
+                <h2 class="page-title">STATISTIQUES</h2>
+                
+                <div class="stats-container">
+                    <div class="stat-card success">
+                        <div class="stat-number">267</div>
+                        <div class="stat-label">Total Élèves</div>
+                    </div>
+                    <div class="stat-card primary">
+                        <div class="stat-number">12.8</div>
+                        <div class="stat-label">Moyenne Générale</div>
+                    </div>
+                    <div class="stat-card warning">
+                        <div class="stat-number">92%</div>
+                        <div class="stat-label">Taux de Réussite</div>
+                    </div>
+                    <div class="stat-card danger">
+                        <div class="stat-number">8</div>
+                        <div class="stat-label">Classes Actives</div>
+                    </div>
+                </div>
+
+                <div class="info-section">
+                    <h2>📊 Statistiques par Niveau</h2>
+                    <div class="stat-row">
+                        <span>Collège</span>
+                        <strong>188 élèves - Moyenne: 12.5/20</strong>
+                    </div>
+                    <div class="stat-row">
+                        <span>Lycée</span>
+                        <strong>119 élèves - Moyenne: 13.2/20</strong>
+                    </div>
+                </div>
+
+                <div class="info-section">
+                    <h2>🏆 Meilleures Moyennes par Classe</h2>
+                    ${data.classes.map(c => `
+                        <div class="stat-row">
+                            <span>${c.nom}</span>
+                            <strong>${(Math.random() * 5 + 12).toFixed(2)}/20</strong>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function showAbout() {
+            const content = document.getElementById('content');
+            content.innerHTML = `
+                <h2 class="page-title">À PROPOS DU SGS</h2>
+                
+                <div class="info-section">
+                    <h2>🏫 Système de Gestion Scolaire</h2>
+                    <p style="font-size: 14px; line-height: 1.6; color: #555;">
+                        Le SGS est une application complète de gestion scolaire conçue pour faciliter 
+                        l'administration des établissements scolaires. Elle permet de gérer efficacement 
+                        les classes, les élèves, les enseignants, les matières et les notes.
+                    </p>
+                </div>
+
+                <div class="info-section">
+                    <h2>✨ Fonctionnalités Principales</h2>
+                    <ul class="features-list">
+                        <li>📊 Tableau de bord avec statistiques en temps réel</li>
+                        <li>🎓 Gestion complète des classes et effectifs</li>
+                        <li>👨‍🎓 Base de données des élèves avec recherche</li>
+                        <li>👨‍🏫 Gestion du personnel enseignant</li>
+                        <li>📚 Configuration des matières et coefficients</li>
+                        <li>📝 Saisie et consultation des notes</li>
+                        <li>📋 Génération automatique de bulletins</li>
+                        <li>📈 Analyses statistiques détaillées</li>
+                        <li>📥 Export des données en CSV/PDF</li>
+                        <li>📱 Interface responsive pour mobile et tablette</li>
+                    </ul>
+                </div>
+
+                <div class="info-section">
+                    <h2>ℹ️ Informations Système</h2>
+                    <div class="stat-row">
+                        <span>Version</span>
+                        <strong>1.0.0</strong>
+                    </div>
+                    <div class="stat-row">
+                        <span>Date de mise à jour</span>
+                        <strong>${new Date().toLocaleDateString('fr-FR')}</strong>
+                    </div>
+                    <div class="stat-row">
+                        <span>Statut</span>
+                        <strong style="color: #27ae60">✅ Opérationnel</strong>
+                    </div>
+                </div>
+
+                <div class="activity-box">
+                    <h3>📞 Support & Contact</h3>
+                    <div class="activity-item">📧 Email: support@sgs.edu</div>
+                    <div class="activity-item">📱 Téléphone: +225 01 02 03 04 05</div>
+                    <div class="activity-item">🌐 Site web: www.sgs.edu</div>
+                    <div class="activity-item">📍 Adresse: Abidjan, Côte d'Ivoire</div>
+                </div>
+            `;
+        }
+
+        // Initialiser l'application avec le dashboard
+        window.addEventListener('DOMContentLoaded', function() {
+            showDashboard();
+        });
+    </script>
+</body>
+</html>
