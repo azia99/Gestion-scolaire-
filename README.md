@@ -344,14 +344,17 @@
             <p>Système de Gestion Scolaire</p>
             <div class="form-group">
                 <label>Identifiant :</label>
-                <input type="text" id="loginUser" value="admin">
+                <input type="text" id="loginUser" placeholder="admin">
             </div>
             <div class="form-group">
                 <label>Mot de passe :</label>
-                <input type="password" id="loginPass" value="admin">
+                <input type="password" id="loginPass" placeholder="admin">
             </div>
             <button class="btn btn-primary" id="btnLogin">🔐 Se connecter</button>
             <div class="error-message" id="loginError"></div>
+            <p style="text-align: center; margin-top: 15px; font-size: 12px; color: #95a5a6;">
+                Par défaut : admin / admin
+            </p>
         </div>
     </div>
 
@@ -389,18 +392,36 @@
 
         // Connexion
         document.getElementById('btnLogin').onclick = function() {
-            const u = document.getElementById('loginUser').value;
-            const p = document.getElementById('loginPass').value;
+            const u = document.getElementById('loginUser').value.trim();
+            const p = document.getElementById('loginPass').value.trim();
+            
+            console.log('Tentative de connexion avec:', u, p);
+            console.log('Identifiants attendus:', DB.auth.username, DB.auth.password);
             
             if (u === DB.auth.username && p === DB.auth.password) {
+                console.log('Connexion réussie !');
                 document.getElementById('loginPage').classList.add('hidden');
                 document.getElementById('appPage').classList.remove('hidden');
                 updateHeader();
                 initApp();
             } else {
+                console.log('Échec de connexion');
                 document.getElementById('loginError').textContent = '❌ Identifiant ou mot de passe incorrect';
             }
         };
+
+        // Permettre la connexion avec la touche Entrée
+        document.getElementById('loginPass').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('btnLogin').click();
+            }
+        });
+
+        document.getElementById('loginUser').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('btnLogin').click();
+            }
+        });
 
         // Déconnexion
         document.getElementById('btnLogout').onclick = function() {
@@ -615,4 +636,352 @@
         function saveEleve() {
             DB.eleves.push({
                 id: DB.eleves.length + 1,
-                matricule: document.getElementById('
+                matricule: document.getElementById('matricule').value,
+                nom: document.getElementById('nom').value,
+                prenoms: document.getElementById('prenoms').value,
+                sexe: document.getElementById('sexe').value,
+                classe: document.getElementById('classe').value,
+                tel: document.getElementById('tel').value
+            });
+            closeModal();
+            renderEleves();
+            alert('✅ Élève ajouté !');
+        }
+
+        function renderEnseignants() {
+            let rows = '';
+            DB.enseignants.forEach(e => {
+                rows += `<tr><td><strong>${e.nom}</strong></td><td>${e.prenoms}</td><td>${e.specialite}</td><td>${e.email}</td></tr>`;
+            });
+
+            document.getElementById('mainContent').innerHTML = `
+                <h2 class="page-title">👨‍🏫 GESTION DES ENSEIGNANTS</h2>
+                <div class="action-buttons">
+                    <button class="btn btn-success" onclick="addEnseignant()">➕ Nouvel Enseignant</button>
+                </div>
+                <div class="data-table">
+                    <table>
+                        <thead><tr><th>Nom</th><th>Prénoms</th><th>Spécialité</th><th>Email</th></tr></thead>
+                        <tbody>${rows}</tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        function addEnseignant() {
+            showModal(`
+                <div class="modal-header">
+                    <h2>➕ Nouvel Enseignant</h2>
+                    <button class="close-btn" onclick="closeModal()">×</button>
+                </div>
+                <div class="form-group">
+                    <label>Nom :</label>
+                    <input type="text" id="nom">
+                </div>
+                <div class="form-group">
+                    <label>Prénoms :</label>
+                    <input type="text" id="prenoms">
+                </div>
+                <div class="form-group">
+                    <label>Spécialité :</label>
+                    <input type="text" id="specialite">
+                </div>
+                <div class="form-group">
+                    <label>Téléphone :</label>
+                    <input type="tel" id="tel">
+                </div>
+                <div class="form-group">
+                    <label>Email :</label>
+                    <input type="email" id="email">
+                </div>
+                <button class="btn btn-success" onclick="saveEnseignant()">✅ Enregistrer</button>
+            `);
+        }
+
+        function saveEnseignant() {
+            DB.enseignants.push({
+                id: DB.enseignants.length + 1,
+                nom: document.getElementById('nom').value,
+                prenoms: document.getElementById('prenoms').value,
+                specialite: document.getElementById('specialite').value,
+                tel: document.getElementById('tel').value,
+                email: document.getElementById('email').value
+            });
+            closeModal();
+            renderEnseignants();
+            alert('✅ Enseignant ajouté !');
+        }
+
+        function renderMatieres() {
+            let rows = '';
+            DB.matieres.forEach(m => {
+                rows += `<tr><td>${m.id}</td><td><strong>${m.nom}</strong></td><td>${m.coef}</td><td>${m.desc}</td></tr>`;
+            });
+
+            document.getElementById('mainContent').innerHTML = `
+                <h2 class="page-title">📚 GESTION DES MATIÈRES</h2>
+                <div class="action-buttons">
+                    <button class="btn btn-success" onclick="addMatiere()">➕ Nouvelle Matière</button>
+                </div>
+                <div class="data-table">
+                    <table>
+                        <thead><tr><th>ID</th><th>Matière</th><th>Coef.</th><th>Description</th></tr></thead>
+                        <tbody>${rows}</tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        function addMatiere() {
+            showModal(`
+                <div class="modal-header">
+                    <h2>➕ Nouvelle Matière</h2>
+                    <button class="close-btn" onclick="closeModal()">×</button>
+                </div>
+                <div class="form-group">
+                    <label>Nom :</label>
+                    <input type="text" id="nom">
+                </div>
+                <div class="form-group">
+                    <label>Coefficient :</label>
+                    <input type="number" id="coef" min="1" max="10">
+                </div>
+                <div class="form-group">
+                    <label>Description :</label>
+                    <input type="text" id="desc">
+                </div>
+                <button class="btn btn-success" onclick="saveMatiere()">✅ Enregistrer</button>
+            `);
+        }
+
+        function saveMatiere() {
+            DB.matieres.push({
+                id: DB.matieres.length + 1,
+                nom: document.getElementById('nom').value,
+                coef: parseInt(document.getElementById('coef').value),
+                desc: document.getElementById('desc').value
+            });
+            closeModal();
+            renderMatieres();
+            alert('✅ Matière ajoutée !');
+        }
+
+        function renderNotes() {
+            let rows = '';
+            DB.notes.forEach(n => {
+                rows += `<tr><td>${n.eleve}</td><td>${n.matiere}</td><td><strong style="color: #27ae60">${n.note}/20</strong></td><td>${n.type}</td><td>${n.date}</td></tr>`;
+            });
+
+            document.getElementById('mainContent').innerHTML = `
+                <h2 class="page-title">📝 GESTION DES NOTES</h2>
+                <div class="action-buttons">
+                    <button class="btn btn-success" onclick="addNote()">➕ Nouvelle Note</button>
+                </div>
+                <div class="data-table">
+                    <table>
+                        <thead><tr><th>Élève</th><th>Matière</th><th>Note</th><th>Type</th><th>Date</th></tr></thead>
+                        <tbody>${rows}</tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        function addNote() {
+            let eleveOptions = '';
+            DB.eleves.forEach(e => {
+                eleveOptions += `<option value="${e.nom} ${e.prenoms}">${e.nom} ${e.prenoms}</option>`;
+            });
+
+            let matiereOptions = '';
+            DB.matieres.forEach(m => {
+                matiereOptions += `<option value="${m.nom}">${m.nom}</option>`;
+            });
+
+            showModal(`
+                <div class="modal-header">
+                    <h2>➕ Nouvelle Note</h2>
+                    <button class="close-btn" onclick="closeModal()">×</button>
+                </div>
+                <div class="form-group">
+                    <label>Élève :</label>
+                    <select id="eleve">${eleveOptions}</select>
+                </div>
+                <div class="form-group">
+                    <label>Matière :</label>
+                    <select id="matiere">${matiereOptions}</select>
+                </div>
+                <div class="form-group">
+                    <label>Note :</label>
+                    <input type="number" id="note" min="0" max="20" step="0.5">
+                </div>
+                <div class="form-group">
+                    <label>Type :</label>
+                    <select id="type">
+                        <option value="Devoir">Devoir</option>
+                        <option value="Contrôle">Contrôle</option>
+                        <option value="Composition">Composition</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Date :</label>
+                    <input type="date" id="date">
+                </div>
+                <button class="btn btn-success" onclick="saveNote()">✅ Enregistrer</button>
+            `);
+        }
+
+        function saveNote() {
+            const dateInput = new Date(document.getElementById('date').value);
+            DB.notes.push({
+                id: DB.notes.length + 1,
+                eleve: document.getElementById('eleve').value,
+                matiere: document.getElementById('matiere').value,
+                note: parseFloat(document.getElementById('note').value),
+                type: document.getElementById('type').value,
+                date: dateInput.toLocaleDateString('fr-FR')
+            });
+            closeModal();
+            renderNotes();
+            alert('✅ Note ajoutée !');
+        }
+
+        function renderBulletins() {
+            let classOptions = '';
+            DB.classes.forEach(c => {
+                classOptions += `<option value="${c.nom}">${c.nom}</option>`;
+            });
+
+            document.getElementById('mainContent').innerHTML = `
+                <h2 class="page-title">📋 GESTION DES BULLETINS</h2>
+                <div class="info-section">
+                    <h2>📋 Génération de Bulletins</h2>
+                    <div class="form-group">
+                        <label>Classe :</label>
+                        <select>${classOptions}</select>
+                    </div>
+                    <div class="form-group">
+                        <label>Période :</label>
+                        <select>
+                            <option>Trimestre 1</option>
+                            <option>Trimestre 2</option>
+                            <option>Trimestre 3</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-success" onclick="alert('✅ Bulletin généré !')">📄 Générer</button>
+                </div>
+            `;
+        }
+
+        function renderStatistiques() {
+            document.getElementById('mainContent').innerHTML = `
+                <h2 class="page-title">📈 STATISTIQUES</h2>
+                <div class="stats-container">
+                    <div class="stat-card success">
+                        <div class="stat-number">267</div>
+                        <div class="stat-label">Total Élèves</div>
+                    </div>
+                    <div class="stat-card primary">
+                        <div class="stat-number">12.8</div>
+                        <div class="stat-label">Moyenne Générale</div>
+                    </div>
+                    <div class="stat-card warning">
+                        <div class="stat-number">92%</div>
+                        <div class="stat-label">Taux de Réussite</div>
+                    </div>
+                    <div class="stat-card danger">
+                        <div class="stat-number">${DB.classes.length}</div>
+                        <div class="stat-label">Classes</div>
+                    </div>
+                </div>
+                <div class="info-section">
+                    <h2>📊 Détails</h2>
+                    <p><strong>Année :</strong> ${DB.settings.annee}</p>
+                    <p><strong>Période :</strong> ${DB.settings.trimestre}</p>
+                    <p><strong>Matières :</strong> ${DB.matieres.length}</p>
+                    <p><strong>Enseignants :</strong> ${DB.enseignants.length}</p>
+                    <p><strong>Notes :</strong> ${DB.notes.length}</p>
+                </div>
+            `;
+        }
+
+        function renderParametres() {
+            document.getElementById('mainContent').innerHTML = `
+                <h2 class="page-title">⚙️ PARAMÈTRES</h2>
+                
+                <div class="info-section">
+                    <h2>🏫 Paramètres de l'établissement</h2>
+                    <div class="form-group">
+                        <label>Nom de l'établissement :</label>
+                        <input type="text" id="setEtab" value="${DB.settings.etablissement}">
+                    </div>
+                    <div class="form-group">
+                        <label>Année académique :</label>
+                        <input type="text" id="setAnnee" value="${DB.settings.annee}">
+                    </div>
+                    <div class="form-group">
+                        <label>Trimestre :</label>
+                        <select id="setTrim">
+                            <option value="Trimestre 1" ${DB.settings.trimestre === 'Trimestre 1' ? 'selected' : ''}>Trimestre 1</option>
+                            <option value="Trimestre 2" ${DB.settings.trimestre === 'Trimestre 2' ? 'selected' : ''}>Trimestre 2</option>
+                            <option value="Trimestre 3" ${DB.settings.trimestre === 'Trimestre 3' ? 'selected' : ''}>Trimestre 3</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-success" onclick="saveSettings()">✅ Enregistrer</button>
+                </div>
+
+                <div class="info-section">
+                    <h2>🔐 Modifier les identifiants</h2>
+                    <div class="form-group">
+                        <label>Nouvel identifiant :</label>
+                        <input type="text" id="newUser" value="${DB.auth.username}">
+                    </div>
+                    <div class="form-group">
+                        <label>Nouveau mot de passe :</label>
+                        <input type="password" id="newPass" value="${DB.auth.password}">
+                    </div>
+                    <div class="form-group">
+                        <label>Confirmer :</label>
+                        <input type="password" id="confirmPass">
+                    </div>
+                    <button class="btn btn-primary" onclick="saveAuth()">🔑 Modifier</button>
+                </div>
+            `;
+        }
+
+        function saveSettings() {
+            DB.settings.etablissement = document.getElementById('setEtab').value;
+            DB.settings.annee = document.getElementById('setAnnee').value;
+            DB.settings.trimestre = document.getElementById('setTrim').value;
+            updateHeader();
+            alert('✅ Paramètres enregistrés !');
+        }
+
+        function saveAuth() {
+            const pass = document.getElementById('newPass').value;
+            const confirm = document.getElementById('confirmPass').value;
+            
+            if (pass !== confirm) {
+                alert('❌ Les mots de passe ne correspondent pas !');
+                return;
+            }
+            
+            DB.auth.username = document.getElementById('newUser').value;
+            DB.auth.password = pass;
+            alert('✅ Identifiants modifiés ! Utilisez-les à la prochaine connexion.');
+        }
+
+        function showModal(content) {
+            document.getElementById('modalContent').innerHTML = content;
+            document.getElementById('modal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+        }
+
+        document.getElementById('modal').onclick = function(e) {
+            if (e.target.id === 'modal') closeModal();
+        };
+    </script>
+</body>
+</html>
